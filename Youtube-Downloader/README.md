@@ -1,4 +1,4 @@
-# YouTube Downloader — Development Notes
+# YouTube Downloader
 
 A small Windows desktop app for downloading YouTube videos and playlists.
 Python + tkinter front-end, [yt-dlp](https://github.com/yt-dlp/yt-dlp) engine,
@@ -10,8 +10,10 @@ Python + tkinter front-end, [yt-dlp](https://github.com/yt-dlp/yt-dlp) engine,
 |---|---|
 | `youtube_downloader.py` | The GUI app (tkinter). The thing we ship. |
 | `downloader.py` | Earlier CLI version using the `yt_dlp` Python library directly. Kept for reference. |
-| `YouTubeDownloader.zip` | **Smart-launcher** distribution (tiny; auto-installs prerequisites). |
-| `YouTubeDownloader-Standalone.zip` | **Standalone** distribution (self-contained; bundles yt-dlp + ffmpeg). |
+| `README.md` | This file — architecture + build/distribution notes. |
+
+Distribution zips and PyInstaller build output are produced locally and
+published as **GitHub Release assets** (they are git-ignored, not committed).
 
 ## Architecture
 
@@ -20,26 +22,28 @@ Python + tkinter front-end, [yt-dlp](https://github.com/yt-dlp/yt-dlp) engine,
   best-effort DWM `ctypes` call).
 - **Downloading**: the GUI shells out to yt-dlp via `subprocess` and streams
   stdout into the log on a background thread, so the UI stays responsive.
-  A `Cancel` button calls `terminate()` on the live process.
-- **yt-dlp resolution** (`_ytdlp_cmd()`), in priority order:
-  1. a `yt-dlp.exe` sitting next to the app (used by the standalone build),
-  2. `python -m yt_dlp` for the current interpreter (dev / launcher),
-  3. `yt-dlp` on `PATH`.
-  When frozen by PyInstaller it never uses option 2 (because `sys.executable`
-  is the app, not Python).
-- **ffmpeg**: if an `ffmpeg.exe` sits next to the app, `--ffmpeg-location` is
+  A `Cancel` button calls `terminate()` on the live process. All subprocess
+  calls use `CREATE_NO_WINDOW` so no console flashes.
+- **yt-dlp resolution** (`_ytdlp_cmd()`), in priority order: a `yt-dlp.exe`
+  next to the app (standalone build) → `python -m yt_dlp` (dev/launcher) →
+  `yt-dlp` on `PATH`. When frozen by PyInstaller it never uses the module form
+  (because `sys.executable` is the app, not Python).
+- **ffmpeg**: if `ffmpeg.exe` sits next to the app, `--ffmpeg-location` is
   passed to yt-dlp (standalone build); otherwise yt-dlp finds it on `PATH`.
-- **No console flashes**: all subprocess calls use `CREATE_NO_WINDOW`.
-- **Prefs**: format / folder / checkbox state persist in `.yd_config.json`
-  next to the app.
 
-## Features
+## Download resilience (Windows / network drives)
 
-- Single video or playlist; playlist detection via **Check**, with an
-  item-range selector (`--playlist-items`).
-- Formats: best / 1080p / 720p / 480p video, or mp3 / m4a audio-only.
-- Optional subtitles (`--write-subs --write-auto-subs`) and thumbnail embed.
-- Live log with color-tagged success/error lines; green status bar.
+Downloading directly to a network/mapped drive (e.g. `Z:\`) or with antivirus
+active can fail with `WinError 32` ("file is being used by another process")
+when yt-dlp renames `.part` → final file. The app mitigates this:
+
+- `--paths temp:%TEMP%\youtube_downloader` keeps all `.part`/intermediate files
+  on the **local disk**; only the finished file is moved to the destination.
+- `--file-access-retries 10` (and `--retries`/`--fragment-retries 10`) ride out
+  transient locks.
+- A **single-instance mutex** (`_acquire_single_instance`) stops a second copy
+  of the app from running, since two instances writing the same files was the
+  original cause of the corruption.
 
 ## Running from source
 

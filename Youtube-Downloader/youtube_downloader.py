@@ -9,6 +9,7 @@ import os
 import sys
 import threading
 import json
+import tempfile
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
@@ -55,6 +56,24 @@ def _ffmpeg_location():
     if os.path.isfile(os.path.join(_SCRIPT_DIR, "ffmpeg.exe")):
         return _SCRIPT_DIR
     return None
+
+
+def _acquire_single_instance():
+    """On Windows, return a mutex handle if no other instance is running, or
+    None if one already is. Prevents two copies from downloading into the same
+    files at once, which corrupts downloads (WinError 32 on rename)."""
+    if os.name != "nt":
+        return True
+    try:
+        import ctypes
+        ERROR_ALREADY_EXISTS = 183
+        handle = ctypes.windll.kernel32.CreateMutexW(
+            None, False, "YouTubeDownloader_SingleInstance")
+        if ctypes.windll.kernel32.GetLastError() == ERROR_ALREADY_EXISTS:
+            return None
+        return handle
+    except Exception:
+        return True  # never block startup on an unexpected error
 
 
 CONFIG_FILE = os.path.join(_SCRIPT_DIR, ".yd_config.json")
@@ -462,6 +481,15 @@ class App(tk.Tk):
         if ff:
             args += ["--ffmpeg-location", ff]
 
+        # Resilience on Windows / network drives: keep volatile .part and
+        # intermediate files on the local disk (only the finished file is moved
+        # to the destination), and retry through transient file locks from
+        # antivirus or SMB shares -- the usual cause of WinError 32 on rename.
+        args += ["--file-access-retries", "10",
+                 "--retries", "10", "--fragment-retries", "10"]
+        args += ["--paths", "temp:" + os.path.join(tempfile.gettempdir(),
+                                                    "youtube_downloader")]
+
         if self.subtitles_var.get():
             args += ["--write-subs", "--write-auto-subs", "--sub-lang", "en"]
         if self.thumb_var.get() and "audio" not in fmt.lower():
@@ -552,5 +580,16 @@ class App(tk.Tk):
 
 
 if __name__ == "__main__":
+    _instance_lock = _acquire_single_instance()
+    if _instance_lock is None:
+        _warn_root = tk.Tk()
+        _warn_root.withdraw()
+        messagebox.showwarning(
+            "Already running",
+            "YouTube Downloader is already open.\n\n"
+            "Running two copies can corrupt downloads, because both write the "
+            "same temporary files. Please use the window that's already open.")
+        _warn_root.destroy()
+        sys.exit(0)
     app = App()
     app.mainloop()
