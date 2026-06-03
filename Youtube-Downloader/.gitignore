@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+.yd_config.json
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+
+# Distribution archives (published as GitHub Release assets, not git-tracked)
+*.zip
+
+# Local downloads
+downloads/
