@@ -60,20 +60,6 @@ That’s it — no installs, no virtual environments, no configs.
 
 ***
 
-## 🧩 Example Pattern
-
-```python
-def main():
-    value = input("Enter a number: ")
-    result = int(value) * 2
-    print(f"Result: {result}")
-
-if __name__ == "__main__":
-    main()
-```
-
-***
-
 ## 📚 Use Cases
 
 * Practicing Python fundamentals
