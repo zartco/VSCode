@@ -38,16 +38,9 @@ Each script:
 - Uses only the Python standard library
 
 ---
-
-## ⚙️ Getting Started
-
-No setup required.
-
 ```bash
 python VSPython/<script>.py
 ````
-
-That’s it — no installs, no virtual environments, no configs.
 
 ***
 
