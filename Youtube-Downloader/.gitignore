@@ -9,8 +9,7 @@ dist/
 *.spec
 
 # Distribution archives (published as GitHub Release assets, not git-tracked)
-YouTubeDownloader.zip
-YouTubeDownloader-Standalone.zip
+*.zip
 
-# Downloaded media (local only)
+# Local downloads
 downloads/
