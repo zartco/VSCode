@@ -1,14 +1,5 @@
-# Virtual environments
-.venv/
-
-# Python
-__pycache__/
-*.pyc
-
-# Documents
+# Media and documents (excluded from agent context and indexing)
 *.pdf
-
-# Video
 *.mp4
 *.avi
 *.mkv
@@ -21,8 +12,6 @@ __pycache__/
 *.mpeg
 *.3gp
 *.ogv
-
-# Subtitles
 *.srt
 *.vtt
 *.ass
