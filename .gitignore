@@ -4,3 +4,29 @@
 # Python
 __pycache__/
 *.pyc
+
+# Documents
+*.pdf
+
+# Video
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.webm
+*.wmv
+*.flv
+*.m4v
+*.mpg
+*.mpeg
+*.3gp
+*.ogv
+
+# Subtitles
+*.srt
+*.vtt
+*.ass
+*.ssa
+*.sub
+*.sbv
+*.ttml
