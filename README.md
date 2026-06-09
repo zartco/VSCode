@@ -1,87 +1,40 @@
-```markdown
-# ⚡ VSCode Workspace
+# VSCode Workspace
 
-> A lightweight, no-dependency Python sandbox for learning, experimenting, and building small scripts.
+A personal VS Code workspace for hands-on Python practice and small desktop utilities.
 
----
+## What's inside
 
-## 🚀 Overview
+| Path | Purpose |
+|---|---|
+| `CS50/` | Self-contained Python and HTML learning exercises (standard library only) |
+| `Youtube-Downloader/` | Windows tkinter GUI for downloading YouTube videos/playlists via yt-dlp |
+| `CLAUDE.md` | Workspace guidance for AI-assisted development |
 
-This repository is a **personal VS Code workspace** centered around hands-on Python practice.
+Standalone `.exe` tools (e.g. `yt-dlp.exe`, `buttery-taskbar.exe`) may sit at the repo root but are not part of the tracked Python code.
 
-It focuses on:
-- Simple, self-contained scripts
-- Core programming concepts
-- Fast, zero-setup execution
+## Running scripts
 
-The goal is to **learn by doing**—keeping everything minimal, practical, and easy to run.
+**CS50 exercises** — no setup, no dependencies:
 
----
-
-## 📦 What's Inside
-
+```powershell
+python CS50\<script>.py
 ```
 
-VSPython/      → Main Python script collection  
-CLAUDE.md      → Workspace guidance & structure notes  
-\*.exe          → Standalone utilities (not part of Python code)
+**YouTube Downloader** — requires Python 3.13+, `yt-dlp`, `ffmpeg`, and tkinter:
 
-````
+```powershell
+python Youtube-Downloader\youtube_downloader.py
+```
 
-### 🧠 VSPython
+See [CS50/README.md](CS50/README.md) for the script catalog and [Youtube-Downloader/README.md](Youtube-Downloader/README.md) for architecture, distribution, and troubleshooting.
 
-The heart of the repository.
+## Design philosophy
 
-Each script:
-- Covers a single concept (e.g., loops, functions, conditionals)
-- Runs independently
-- Uses only the Python standard library
+- **Minimalism** — CS50 scripts use only the Python standard library
+- **Clarity** — one concept per file
+- **Isolation** — each script runs independently
+- **Speed** — run directly from the terminal with no build step
 
----
-```bash
-python VSPython/<script>.py
-````
-
-***
-
-## 🎯 Design Philosophy
-
-* ✅ **Minimalism** — no dependencies, no overhead
-* ✅ **Clarity** — one concept per script
-* ✅ **Isolation** — each file stands alone
-* ✅ **Speed** — run instantly from the terminal
-
-***
-
-## 📚 Use Cases
-
-* Practicing Python fundamentals
-* Testing small ideas quickly
-* Building a personal script reference
-* Learning through repetition and iteration
-
-***
-
-## 🔮 Future Plans
-
-* Organize scripts by topic
-* Add inline documentation/comments
-* Expand into small tools & utilities
-* Introduce basic testing
-
-***
-
-## 🤝 Contributing
-
-This is primarily a personal workspace, but contributions are welcome if you want to:
-
-* Add examples
-* Improve readability
-* Refactor scripts
-
-***
-
-## 👤 Author
+## Author
 
 [zartco](https://github.com/zartco)
-
