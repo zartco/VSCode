@@ -1,0 +1,42 @@
+<!DOCTYPE html>                            <!-- Tells the browser to use modern HTML -->
+<html>
+  <head>
+    <title>Zane's Page</title>
+    <!-- The <style> block is where CSS lives. Each rule = selector { property: value; } -->
+    <style>
+      /* "body" selects the entire visible page */
+      body {
+        font-family: Arial, sans-serif;    /* Swap the default serif for a clean sans-serif font */
+        background-color: #d8bf85;         /* Page background — a soft off-white */
+        color: #2c2c2a;                    /* Default text color for everything inside body */
+        max-width: 560px;                  /* Stop lines from stretching uncomfortably wide */
+        margin: 40px auto;                 /* 40px top/bottom, auto left/right = centers the page */
+        padding: 0 20px;                   /* A little breathing room on the sides */
+        line-height: 1.6;                  /* Extra space between lines = easier reading */
+      }
+
+      /* "h1" selects every <h1> heading */
+      h1 {
+        color: #16283a;                    /* Make the big heading blue */
+      }
+
+      /* "a" selects every link */
+      a {
+        color: #d85a30;                    /* Recolor the link from default blue to coral */
+        text-decoration: none;             /* Remove the underline */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Zane</h1>                          <!-- Now blue, thanks to the h1 rule -->
+    <p>This is my first styled webpage.</p>
+    <h2>My Hobbies</h2>
+    <ul>
+      <li>Playing Guitar</li>
+      <li>Playing Video Games</li>
+      <li>Reading</li>
+    </ul>
+    <h2>My Favorite Website</h2>
+    <a href="https://www.youtube.com">YouTube</a>
+  </body>
+</html>
