@@ -13,3 +13,25 @@ dist/
 
 # Local downloads
 downloads/
+
+# Downloaded media (never commit videos, subtitles, or PDFs)
+*.pdf
+*.mp4
+*.avi
+*.mkv
+*.mov
+*.webm
+*.wmv
+*.flv
+*.m4v
+*.mpg
+*.mpeg
+*.3gp
+*.ogv
+*.srt
+*.vtt
+*.ass
+*.ssa
+*.sub
+*.sbv
+*.ttml
