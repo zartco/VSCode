@@ -101,6 +101,48 @@ def is_playlist_url(url):
     return "playlist" in url or "list=" in url
 
 
+FORMAT_ARG_MAP = {
+    "Video (best)":     ["--format", "bestvideo+bestaudio/best", "--merge-output-format", "mp4"],
+    "Video 1080p":      ["--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]", "--merge-output-format", "mp4"],
+    "Video 720p":       ["--format", "bestvideo[height<=720]+bestaudio/best[height<=720]", "--merge-output-format", "mp4"],
+    "Video 480p":       ["--format", "bestvideo[height<=480]+bestaudio/best[height<=480]", "--merge-output-format", "mp4"],
+    "Audio only (mp3)": ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "0"],
+    "Audio only (m4a)": ["--extract-audio", "--audio-format", "m4a", "--audio-quality", "0"],
+}
+
+
+def build_resilience_args():
+    """Return yt-dlp flags that mitigate WinError 32 on network drives."""
+    return [
+        "--file-access-retries", "10",
+        "--retries", "10", "--fragment-retries", "10",
+        "--paths", "temp:" + os.path.join(tempfile.gettempdir(), "youtube_downloader"),
+    ]
+
+
+def build_yt_dlp_args(ytdlp, fmt, output_template, ffmpeg_dir=None, subtitles=False,
+                      embed_thumbnail=False, playlist_detected=False,
+                      range_start="1", range_end=""):
+    """Assemble the yt-dlp CLI argument list for a download (URL appended by caller)."""
+    args = list(ytdlp) + ["-o", output_template] + FORMAT_ARG_MAP.get(fmt, [])
+
+    if ffmpeg_dir:
+        args += ["--ffmpeg-location", ffmpeg_dir]
+
+    args += build_resilience_args()
+
+    if subtitles:
+        args += ["--write-subs", "--write-auto-subs", "--sub-lang", "en"]
+    if embed_thumbnail and "audio" not in fmt.lower():
+        args += ["--embed-thumbnail"]
+    if playlist_detected:
+        start = range_start.strip() or "1"
+        end = range_end.strip()
+        args += ["--playlist-items", f"{start}:{end}" if end else f"{start}:"]
+
+    return args
+
+
 def fetch_playlist_count(url, ytdlp):
     """Return (title, count) for a playlist, or (None, None) on failure."""
     try:
@@ -463,42 +505,17 @@ class App(tk.Tk):
         self._status("Ready")
 
     def _build_yt_args(self, url, output_template):
-        ytdlp = _ytdlp_cmd()
-        fmt = self.fmt_var.get()
-
-        format_map = {
-            "Video (best)":     ["--format", "bestvideo+bestaudio/best", "--merge-output-format", "mp4"],
-            "Video 1080p":      ["--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]", "--merge-output-format", "mp4"],
-            "Video 720p":       ["--format", "bestvideo[height<=720]+bestaudio/best[height<=720]", "--merge-output-format", "mp4"],
-            "Video 480p":       ["--format", "bestvideo[height<=480]+bestaudio/best[height<=480]", "--merge-output-format", "mp4"],
-            "Audio only (mp3)": ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "0"],
-            "Audio only (m4a)": ["--extract-audio", "--audio-format", "m4a", "--audio-quality", "0"],
-        }
-
-        args = list(ytdlp) + ["-o", output_template] + format_map.get(fmt, [])
-
-        ff = _ffmpeg_location()
-        if ff:
-            args += ["--ffmpeg-location", ff]
-
-        # Resilience on Windows / network drives: keep volatile .part and
-        # intermediate files on the local disk (only the finished file is moved
-        # to the destination), and retry through transient file locks from
-        # antivirus or SMB shares -- the usual cause of WinError 32 on rename.
-        args += ["--file-access-retries", "10",
-                 "--retries", "10", "--fragment-retries", "10"]
-        args += ["--paths", "temp:" + os.path.join(tempfile.gettempdir(),
-                                                    "youtube_downloader")]
-
-        if self.subtitles_var.get():
-            args += ["--write-subs", "--write-auto-subs", "--sub-lang", "en"]
-        if self.thumb_var.get() and "audio" not in fmt.lower():
-            args += ["--embed-thumbnail"]
-        if self._playlist_detected:
-            start = self.range_start_var.get().strip() or "1"
-            end = self.range_end_var.get().strip()
-            args += ["--playlist-items", f"{start}:{end}" if end else f"{start}:"]
-
+        args = build_yt_dlp_args(
+            _ytdlp_cmd(),
+            self.fmt_var.get(),
+            output_template,
+            ffmpeg_dir=_ffmpeg_location(),
+            subtitles=self.subtitles_var.get(),
+            embed_thumbnail=self.thumb_var.get(),
+            playlist_detected=self._playlist_detected,
+            range_start=self.range_start_var.get(),
+            range_end=self.range_end_var.get(),
+        )
         args.append(url)
         return args
 
