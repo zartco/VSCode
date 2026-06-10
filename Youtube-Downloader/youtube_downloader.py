@@ -101,6 +101,55 @@ def is_playlist_url(url):
     return "playlist" in url or "list=" in url
 
 
+FORMAT_ARG_MAP = {
+    "Video (best)":     ["--format", "bestvideo+bestaudio/best", "--merge-output-format", "mp4"],
+    "Video 1080p":      ["--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]", "--merge-output-format", "mp4"],
+    "Video 720p":       ["--format", "bestvideo[height<=720]+bestaudio/best[height<=720]", "--merge-output-format", "mp4"],
+    "Video 480p":       ["--format", "bestvideo[height<=480]+bestaudio/best[height<=480]", "--merge-output-format", "mp4"],
+    "Audio only (mp3)": ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "0"],
+    "Audio only (m4a)": ["--extract-audio", "--audio-format", "m4a", "--audio-quality", "0"],
+}
+
+# yt-dlp ignores --paths when -o contains an absolute directory; keep the
+# template filename-only and route final output via --paths home:FOLDER.
+OUTPUT_FILENAME_TEMPLATE = "%(title)s.%(ext)s"
+
+
+def build_resilience_args(output_folder):
+    """Return yt-dlp flags that stage temp files locally and write finals to output_folder."""
+    temp_dir = os.path.join(tempfile.gettempdir(), "youtube_downloader")
+    return [
+        "--file-access-retries", "10",
+        "--retries", "10", "--fragment-retries", "10",
+        "--paths", f"home:{output_folder}",
+        "--paths", f"temp:{temp_dir}",
+    ]
+
+
+def build_yt_dlp_args(ytdlp, fmt, output_folder, ffmpeg_dir=None, subtitles=False,
+                      embed_thumbnail=False, playlist_detected=False,
+                      range_start="1", range_end=""):
+    """Assemble the yt-dlp CLI argument list for a download (URL appended by caller)."""
+    args = (list(ytdlp) + ["-o", OUTPUT_FILENAME_TEMPLATE]
+            + FORMAT_ARG_MAP.get(fmt, []))
+
+    if ffmpeg_dir:
+        args += ["--ffmpeg-location", ffmpeg_dir]
+
+    args += build_resilience_args(output_folder)
+
+    if subtitles:
+        args += ["--write-subs", "--write-auto-subs", "--sub-lang", "en"]
+    if embed_thumbnail and "audio" not in fmt.lower():
+        args += ["--embed-thumbnail"]
+    if playlist_detected:
+        start = range_start.strip() or "1"
+        end = range_end.strip()
+        args += ["--playlist-items", f"{start}:{end}" if end else f"{start}:"]
+
+    return args
+
+
 def fetch_playlist_count(url, ytdlp):
     """Return (title, count) for a playlist, or (None, None) on failure."""
     try:
@@ -156,6 +205,7 @@ class App(tk.Tk):
         self.config = load_config()
         self._proc = None
         self._job = None
+        self._download_id = 0
         self._cancelled = False
         self._playlist_detected = False
 
@@ -462,43 +512,18 @@ class App(tk.Tk):
         self._playlist_detected = False
         self._status("Ready")
 
-    def _build_yt_args(self, url, output_template):
-        ytdlp = _ytdlp_cmd()
-        fmt = self.fmt_var.get()
-
-        format_map = {
-            "Video (best)":     ["--format", "bestvideo+bestaudio/best", "--merge-output-format", "mp4"],
-            "Video 1080p":      ["--format", "bestvideo[height<=1080]+bestaudio/best[height<=1080]", "--merge-output-format", "mp4"],
-            "Video 720p":       ["--format", "bestvideo[height<=720]+bestaudio/best[height<=720]", "--merge-output-format", "mp4"],
-            "Video 480p":       ["--format", "bestvideo[height<=480]+bestaudio/best[height<=480]", "--merge-output-format", "mp4"],
-            "Audio only (mp3)": ["--extract-audio", "--audio-format", "mp3", "--audio-quality", "0"],
-            "Audio only (m4a)": ["--extract-audio", "--audio-format", "m4a", "--audio-quality", "0"],
-        }
-
-        args = list(ytdlp) + ["-o", output_template] + format_map.get(fmt, [])
-
-        ff = _ffmpeg_location()
-        if ff:
-            args += ["--ffmpeg-location", ff]
-
-        # Resilience on Windows / network drives: keep volatile .part and
-        # intermediate files on the local disk (only the finished file is moved
-        # to the destination), and retry through transient file locks from
-        # antivirus or SMB shares -- the usual cause of WinError 32 on rename.
-        args += ["--file-access-retries", "10",
-                 "--retries", "10", "--fragment-retries", "10"]
-        args += ["--paths", "temp:" + os.path.join(tempfile.gettempdir(),
-                                                    "youtube_downloader")]
-
-        if self.subtitles_var.get():
-            args += ["--write-subs", "--write-auto-subs", "--sub-lang", "en"]
-        if self.thumb_var.get() and "audio" not in fmt.lower():
-            args += ["--embed-thumbnail"]
-        if self._playlist_detected:
-            start = self.range_start_var.get().strip() or "1"
-            end = self.range_end_var.get().strip()
-            args += ["--playlist-items", f"{start}:{end}" if end else f"{start}:"]
-
+    def _build_yt_args(self, url, output_folder):
+        args = build_yt_dlp_args(
+            _ytdlp_cmd(),
+            self.fmt_var.get(),
+            output_folder,
+            ffmpeg_dir=_ffmpeg_location(),
+            subtitles=self.subtitles_var.get(),
+            embed_thumbnail=self.thumb_var.get(),
+            playlist_detected=self._playlist_detected,
+            range_start=self.range_start_var.get(),
+            range_end=self.range_end_var.get(),
+        )
         args.append(url)
         return args
 
@@ -509,10 +534,16 @@ class App(tk.Tk):
         if not url:
             messagebox.showwarning("Missing URL", "Please enter a YouTube URL.")
             return
+        if self._proc is not None and self._proc.poll() is None:
+            messagebox.showwarning(
+                "Download in progress",
+                "Please wait for the current download to finish or cancel it first.")
+            return
 
         folder = self.folder_var.get().strip() or "./downloads"
         os.makedirs(folder, exist_ok=True)
-        output_template = os.path.join(folder, "%(title)s.%(ext)s")
+        self._download_id += 1
+        download_id = self._download_id
 
         save_config({
             "last_folder": folder,
@@ -533,17 +564,21 @@ class App(tk.Tk):
         self._log(f"Output folder: {folder}\n", "muted")
         self._status("Downloading…")
 
-        args = self._build_yt_args(url, output_template)
+        args = self._build_yt_args(url, folder)
 
         def _run():
+            proc = None
             try:
-                self._proc = subprocess.Popen(
+                proc = subprocess.Popen(
                     args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                     text=True, creationflags=_NO_WINDOW)
-                for line in self._proc.stdout:
+                self._proc = proc
+                for line in proc.stdout:
                     self.after(0, lambda l=line.rstrip(): self._log(l))
-                self._proc.wait()
-                rc = self._proc.returncode
+                proc.wait()
+                rc = proc.returncode
+                if download_id != self._download_id:
+                    return
                 if self._cancelled:
                     pass
                 elif rc == 0:
@@ -553,12 +588,13 @@ class App(tk.Tk):
                     self.after(0, lambda: self._log(f"\nError: yt-dlp exited with code {rc}", "error"))
                     self.after(0, lambda: self._status("Error"))
             except FileNotFoundError:
-                self.after(0, lambda: self._log(
-                    "Error: yt-dlp not found.\n"
-                    "Install it with:  pip install yt-dlp", "error"))
-                self.after(0, lambda: self._status("yt-dlp not found"))
+                if download_id == self._download_id:
+                    self.after(0, lambda: self._log(
+                        "Error: yt-dlp not found.\n"
+                        "Install it with:  pip install yt-dlp", "error"))
+                    self.after(0, lambda: self._status("yt-dlp not found"))
             finally:
-                self.after(0, self._download_done)
+                self.after(0, lambda: self._download_done(download_id))
 
         self._job = threading.Thread(target=_run, daemon=True)
         self._job.start()
@@ -569,9 +605,10 @@ class App(tk.Tk):
             self._proc.terminate()
             self._log("\nCancelled.", "muted")
             self._status("Cancelled")
-        self._download_done()
 
-    def _download_done(self):
+    def _download_done(self, download_id=None):
+        if download_id is not None and download_id != self._download_id:
+            return
         self.progress.stop()
         self.progress.grid_remove()
         self.dl_btn.config(state="normal")
