@@ -1,9 +1,10 @@
 """Tests for youtube_downloader utility logic (no tkinter GUI)."""
 
-import json
 import os
 import tempfile
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
+
+import pytest
 
 import youtube_downloader as yd
 
@@ -105,6 +106,39 @@ class TestBuildYtDlpArgs:
         idx = args.index("--playlist-items")
         assert args[idx + 1] == "1:10"
 
+    @pytest.mark.parametrize("fmt,height", [
+        ("Video 1080p", "1080"),
+        ("Video 720p", "720"),
+        ("Video 480p", "480"),
+    ])
+    def test_video_quality_caps_height(self, fmt, height):
+        args = yd.build_yt_dlp_args(self.YTDLP, fmt, self.OUT)
+        fmt_idx = args.index("--format")
+        format_str = args[fmt_idx + 1]
+        assert f"height<={height}" in format_str
+
+    def test_unknown_format_omits_format_flags(self):
+        args = yd.build_yt_dlp_args(self.YTDLP, "Unknown format", self.OUT)
+        assert "--format" not in args
+        assert "--file-access-retries" in args
+
+    def test_skips_playlist_items_when_not_detected(self):
+        args = yd.build_yt_dlp_args(
+            self.YTDLP, "Video (best)", self.OUT,
+            playlist_detected=False, range_start="2", range_end="5")
+        assert "--playlist-items" not in args
+
+
+class TestFfmpegLocation:
+    def test_returns_script_dir_when_bundled(self, tmp_path, monkeypatch):
+        (tmp_path / "ffmpeg.exe").write_text("", encoding="utf-8")
+        monkeypatch.setattr(yd, "_SCRIPT_DIR", str(tmp_path))
+        assert yd._ffmpeg_location() == str(tmp_path)
+
+    def test_returns_none_when_missing(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(yd, "_SCRIPT_DIR", str(tmp_path))
+        assert yd._ffmpeg_location() is None
+
 
 class TestConfigPersistence:
     def test_load_returns_empty_dict_when_missing(self, tmp_path, monkeypatch):
@@ -146,6 +180,12 @@ class TestYtdlpCmd:
     def test_frozen_build_uses_path_binary(self, monkeypatch):
         monkeypatch.setattr(yd, "_YTDLP_EXE_CANDIDATES", [])
         monkeypatch.setattr(yd.sys, "frozen", True, raising=False)
+        assert yd._ytdlp_cmd() == ["yt-dlp"]
+
+    def test_falls_back_to_path_binary(self, monkeypatch):
+        monkeypatch.setattr(yd, "_YTDLP_EXE_CANDIDATES", [])
+        monkeypatch.setattr(yd.sys, "frozen", False, raising=False)
+        monkeypatch.setattr("importlib.util.find_spec", lambda name: None)
         assert yd._ytdlp_cmd() == ["yt-dlp"]
 
 

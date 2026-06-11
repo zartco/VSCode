@@ -1,5 +1,7 @@
 """Tests for the CLI downloader module."""
 
+from unittest.mock import MagicMock, patch
+
 import downloader
 
 
@@ -45,3 +47,35 @@ class TestCreateProgressHook:
         hook({"status": "finished", "filename": "video.mp4"})
         out = capsys.readouterr().out
         assert out.startswith("  Downloaded:")
+
+
+class TestDetectPlaylist:
+    def test_detects_playlist_with_entry_count(self):
+        mock_ydl = MagicMock()
+        mock_ydl.extract_info.return_value = {
+            "entries": [{"id": "a"}, {"id": "b"}, {"id": "c"}],
+        }
+        with patch("downloader.yt_dlp.YoutubeDL") as ydl_cls:
+            ydl_cls.return_value.__enter__.return_value = mock_ydl
+            is_playlist, count = downloader.detect_playlist({}, "http://example.com")
+        assert is_playlist is True
+        assert count == 3
+
+    def test_single_video_has_count_one(self):
+        mock_ydl = MagicMock()
+        mock_ydl.extract_info.return_value = {"title": "solo video"}
+        with patch("downloader.yt_dlp.YoutubeDL") as ydl_cls:
+            ydl_cls.return_value.__enter__.return_value = mock_ydl
+            is_playlist, count = downloader.detect_playlist({}, "http://example.com")
+        assert is_playlist is False
+        assert count == 1
+
+    def test_returns_none_on_download_error(self, capsys):
+        mock_ydl = MagicMock()
+        mock_ydl.extract_info.side_effect = downloader.yt_dlp.utils.DownloadError("blocked")
+        with patch("downloader.yt_dlp.YoutubeDL") as ydl_cls:
+            ydl_cls.return_value.__enter__.return_value = mock_ydl
+            is_playlist, count = downloader.detect_playlist({}, "http://example.com")
+        assert is_playlist is None
+        assert count is None
+        assert "Error fetching video information" in capsys.readouterr().out
