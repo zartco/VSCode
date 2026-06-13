@@ -1,81 +1,41 @@
-# VSCode Workspace
+# College Computer Science Workspace
 
-A personal Python workspace combining CS50 coursework exercises and a full YouTube downloader desktop app.
+A unified, continuously evolving repository tracking a four-year computer science degree. Currently, it houses my CS50 coursework exercises and a fully featured YouTube downloader desktop application.
 
----
-
-## What's Inside
-
-```
-CS50/                  → Python & HTML exercises from CS50P
-Youtube-Downloader/    → Windows desktop app — downloads YouTube videos/playlists
-```
+This repository is maintained under perpetual AI stewardship (see [AGENTS.md](AGENTS.md)) to enforce coding standards, test coverage, and documentation consistency as complexity scales over the next four years.
 
 ---
 
-## CS50
+## Repository Structure
 
-Python scripts written while working through [CS50's Introduction to Programming with Python](https://cs50.harvard.edu/python/).
-
-Each file covers one concept and runs on its own — no external libraries needed.
-
-| File | Concept |
-|---|---|
-| `hello.py` / `helloworld.py` | Print statements, basic I/O |
-| `calculator.py` / `calculator1.py` | Functions, arithmetic |
-| `compare.py` | Conditionals |
-| `parity.py` | Modulo operator |
-| `loops.py` | `for` loops, `range()` |
-| `cat.py` | String input and manipulation |
-| `grade.py` | Nested conditionals |
-| `house.py` | Functions, control flow |
-| `html_skeleton.html` / `index.html` | Basic HTML structure |
-
-**Run any script:**
-
-```powershell
-python CS50/<script>.py
 ```
-
-Requires Python 3.x — no pip installs needed.
+CS50/                  → Python & HTML exercises from CS50
+Youtube-Downloader/    → Windows desktop app for downloading videos/playlists
+```
 
 ---
 
-## Youtube Downloader
+## 1. CS50 Exercises
 
-A Windows desktop app for downloading YouTube videos and playlists.
+Python and HTML scripts written while working through [CS50's Introduction to Programming with Python](https://cs50.harvard.edu/python/).
+Each script is isolated and demonstrates core programming concepts.
 
-**Stack:** Python 3.13 · tkinter (dark VS Code-style UI) · [yt-dlp](https://github.com/yt-dlp/yt-dlp) · ffmpeg
+For detailed information, refer to the [CS50 README](CS50/README.md).
 
-**Features:**
-- Single videos and full playlists
-- Format selection: best quality, 1080p / 720p / 480p, audio-only MP3/M4A
-- Playlist item-range picker (e.g. download items 3–10 only)
-- Subtitle download and thumbnail embedding
-- Live download log with cancel button
-- Saves last-used folder and settings across sessions
-- Resilient against Windows file-lock errors (network drives, antivirus)
-- Single-instance mutex — prevents two copies corrupting the same download
+---
 
-### Run from source
+## 2. YouTube Downloader
 
-```powershell
-pip install yt-dlp
-python Youtube-Downloader/youtube_downloader.py
-```
+A resilient Windows desktop application for downloading YouTube videos and playlists, built with `tkinter`, `yt-dlp`, and `ffmpeg`.
 
-Requires Python 3.13+. `tkinter` ships with the standard Windows Python installer. `ffmpeg` is optional but needed for format merging — install via `winget install Gyan.FFmpeg` or add `ffmpeg.exe` next to the script.
+For architecture details, execution instructions, and distribution formats, refer to the [YouTube Downloader README](Youtube-Downloader/README.md).
 
-### Distribution
+---
 
-Two pre-built distributions are published as [GitHub Release](https://github.com/zartco/VSCode/releases) assets (not committed to the repo):
+## Stewardship
 
-| Package | Size | What it needs |
-|---|---|---|
-| `YouTubeDownloader.zip` | ~24 KB | Python + winget (auto-installed by `setup.ps1`) |
-| `YouTubeDownloader-Standalone.zip` | ~112 MB | Nothing — fully self-contained |
-
-The standalone `.exe` is unsigned, so Windows SmartScreen will show an "unknown publisher" warning — click *More info → Run anyway*.
+This repository follows the guidelines established in `AGENTS.md`.
+AI agents and contributors alike must read it before modifying code, to ensure that scripts remain documented, cleanly structured, and properly tested.
 
 ---
 

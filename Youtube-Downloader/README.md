@@ -8,7 +8,7 @@ Python + tkinter front-end, [yt-dlp](https://github.com/yt-dlp/yt-dlp) engine,
 
 | File | Purpose |
 |---|---|
-| `youtube_downloader.py` | The GUI app (tkinter). The thing we ship. |
+| `youtube_downloader.py` | The GUI app (tkinter). The main application script. |
 | `downloader.py` | Earlier CLI version using the `yt_dlp` Python library directly. Kept for reference. |
 | `README.md` | This file — architecture + build/distribution notes. |
 
@@ -49,6 +49,11 @@ when yt-dlp renames `.part` → final file. The app mitigates this:
 
 ```powershell
 python youtube_downloader.py
+```
+
+Or, to run the CLI version:
+```powershell
+python downloader.py
 ```
 
 Requires Python 3.13+, plus `yt-dlp` (`pip install yt-dlp`) and `ffmpeg` on
