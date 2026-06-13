@@ -1,4 +1,4 @@
-"""YouTube downloader with a dark, VS Code-inspired tkinter GUI.
+﻿"""YouTube downloader with a dark, VS Code-inspired tkinter GUI.
 
 Supports single videos and playlists (with item-range selection), format/quality
 selection, subtitles, and thumbnail embedding. Downloads run on a background
@@ -13,7 +13,7 @@ import tempfile
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-# ── App directory (works both as a .py and as a frozen PyInstaller .exe) ──
+# â”€â”€ App directory (works both as a .py and as a frozen PyInstaller .exe) â”€â”€
 if getattr(sys, "frozen", False):
     _SCRIPT_DIR = os.path.dirname(sys.executable)
 else:
@@ -80,6 +80,7 @@ CONFIG_FILE = os.path.join(_SCRIPT_DIR, ".yd_config.json")
 
 
 def load_config():
+    """Load application configuration from file."""
     if os.path.exists(CONFIG_FILE):
         try:
             with open(CONFIG_FILE) as f:
@@ -90,6 +91,7 @@ def load_config():
 
 
 def save_config(data):
+    """Save application configuration to file."""
     try:
         with open(CONFIG_FILE, "w") as f:
             json.dump(data, f)
@@ -98,6 +100,7 @@ def save_config(data):
 
 
 def is_playlist_url(url):
+    """Determine if the given URL is a YouTube playlist."""
     return "playlist" in url or "list=" in url
 
 
@@ -123,7 +126,7 @@ def fetch_playlist_count(url, ytdlp):
         return None, None
 
 
-# ── Palette (VS Code dark + GitHub-green accent) ──────────────────────────────
+# â”€â”€ Palette (VS Code dark + GitHub-green accent) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 C = {
     "bg":          "#1e1e1e",
     "panel":       "#252526",
@@ -150,6 +153,7 @@ MONO_FONT = ("Consolas", 9)
 
 
 class App(tk.Tk):
+    """Main application class for YouTube Downloader GUI."""
     def __init__(self):
         super().__init__()
         self.title("YouTube Downloader")
@@ -169,7 +173,7 @@ class App(tk.Tk):
         self._apply_dark_titlebar()
         self.after(60, self._apply_dark_titlebar)
 
-    # ── Styling ──────────────────────────────────────────────────────────────
+    # â”€â”€ Styling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _setup_style(self):
         style = ttk.Style(self)
@@ -288,7 +292,7 @@ class App(tk.Tk):
         y = (self.winfo_screenheight() - h) // 3
         self.geometry(f"{w}x{h}+{x}+{y}")
 
-    # ── UI construction ────────────────────────────────────────────────────
+    # â”€â”€ UI construction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _build_ui(self):
         # Status bar pinned to the bottom (VS Code style)
@@ -353,7 +357,7 @@ class App(tk.Tk):
         folder_row = ttk.Frame(content)
         folder_row.grid(row=7, column=0, sticky="ew")
         self.folder_var = tk.StringVar(value=self.config.get("last_folder", "./downloads"))
-        ttk.Button(folder_row, text="Browse…", command=self._browse_folder).pack(side="right")
+        ttk.Button(folder_row, text="Browseâ€¦", command=self._browse_folder).pack(side="right")
         ttk.Entry(folder_row, textvariable=self.folder_var).pack(
             side="left", fill="x", expand=True, padx=(0, 8))
 
@@ -408,7 +412,7 @@ class App(tk.Tk):
         self.log.tag_configure("info", foreground=C["accent_text"])
         self.log.tag_configure("muted", foreground=C["fg_muted"])
 
-    # ── Helpers ────────────────────────────────────────────────────────────
+    # â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _log(self, text, tag=None):
         self.log.configure(state="normal")
@@ -428,9 +432,9 @@ class App(tk.Tk):
         url = self.url_var.get().strip()
         if not url:
             return
-        self.playlist_label.config(text="Checking…")
+        self.playlist_label.config(text="Checkingâ€¦")
         self.check_btn.config(state="disabled")
-        self._status("Checking URL…")
+        self._status("Checking URLâ€¦")
 
         def _run():
             ytdlp = _ytdlp_cmd()
@@ -438,7 +442,7 @@ class App(tk.Tk):
                 title, count = fetch_playlist_count(url, ytdlp)
                 msg = "Playlist detected"
                 if title:
-                    msg += f": “{title}”"
+                    msg += f": â€œ{title}â€"
                 if count:
                     msg += f"  ({count} items)"
                 self.after(0, lambda: self._show_playlist_ui(msg, count))
@@ -502,7 +506,7 @@ class App(tk.Tk):
         args.append(url)
         return args
 
-    # ── Download control ───────────────────────────────────────────────────
+    # â”€â”€ Download control â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     def _start_download(self):
         url = self.url_var.get().strip()
@@ -531,7 +535,7 @@ class App(tk.Tk):
         self.log.configure(state="disabled")
         self._log(f"Starting download: {url}", "info")
         self._log(f"Output folder: {folder}\n", "muted")
-        self._status("Downloading…")
+        self._status("Downloadingâ€¦")
 
         args = self._build_yt_args(url, output_template)
 
@@ -547,7 +551,7 @@ class App(tk.Tk):
                 if self._cancelled:
                     pass
                 elif rc == 0:
-                    self.after(0, lambda: self._log("\n✓ Download complete!", "success"))
+                    self.after(0, lambda: self._log("\nâœ“ Download complete!", "success"))
                     self.after(0, lambda: self._status("Download complete"))
                 else:
                     self.after(0, lambda: self._log(f"\nError: yt-dlp exited with code {rc}", "error"))
@@ -593,3 +597,4 @@ if __name__ == "__main__":
         sys.exit(0)
     app = App()
     app.mainloop()
+

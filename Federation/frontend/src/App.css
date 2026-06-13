@@ -1,0 +1,66 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: 44px;
+  background: var(--bg-1);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+/* SSE status indicator */
+.sse-indicator {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.sse-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.sse-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sse-indicator--connecting .sse-dot  { background: var(--accent-yellow); }
+.sse-indicator--connected  .sse-dot  { background: var(--accent-green); }
+.sse-indicator--disconnected .sse-dot { background: var(--text-muted); }
+
+.sse-indicator--connecting  .sse-label { color: var(--accent-yellow); }
+.sse-indicator--connected   .sse-label { color: var(--accent-green); }
+.sse-indicator--disconnected .sse-label { color: var(--text-muted); }
+
+/* Three-panel layout */
+.app-panels {
+  display: grid;
+  grid-template-columns: 240px 1fr 2fr;
+  flex: 1;
+  overflow: hidden;
+}
+
+.panel {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}

@@ -1,3 +1,4 @@
+﻿"""Command line YouTube downloader utilizing yt-dlp."""
 import os
 import re
 from pathlib import Path
@@ -128,7 +129,7 @@ def download_videos(url, output_path):
             print(f"\nStarting download ({video_count} {'video' if video_count == 1 else 'videos'})...\n")
             ydl.download([url])
 
-        print(f"\n✓ Successfully downloaded {video_count} {'video' if video_count == 1 else 'videos'} to {output_path}")
+        print(f"\nâœ“ Successfully downloaded {video_count} {'video' if video_count == 1 else 'videos'} to {output_path}")
         return True
 
     except yt_dlp.utils.DownloadError as e:
@@ -143,6 +144,7 @@ def download_videos(url, output_path):
 
 
 def main():
+    """Main entry point for the CLI."""
     print("=" * 50)
     print("YouTube Downloader")
     print("=" * 50)
@@ -166,3 +168,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
