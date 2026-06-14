@@ -61,6 +61,7 @@ export default function FederationDrawer() {
           </h2>
         </div>
         <button
+          aria-label="Close Federation Control Plane"
           onClick={() => setDrawerOpen(false)}
           style={{
             background: "transparent",
