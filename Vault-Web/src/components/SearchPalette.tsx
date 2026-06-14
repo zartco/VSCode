@@ -35,18 +35,32 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
   }, []);
 
   useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
     if (isOpen) {
       inputRef.current?.focus();
       if (query) {
-        const searchResults = fuse.current.search(query).map((r) => r.item);
-        setResults(searchResults);
+        // Debounce the search operation
+        // ⚡ Bolt: delays fuse.current.search by 300ms to avoid blocking main thread on every keystroke
+        timeoutId = setTimeout(() => {
+          const searchResults = fuse.current.search(query).map((r) => r.item);
+          setResults(searchResults);
+        }, 300);
       } else {
-        setResults([]);
+        timeoutId = setTimeout(() => {
+          setResults([]);
+        }, 0);
       }
     } else {
-      setQuery("");
-      setResults([]);
+      timeoutId = setTimeout(() => {
+        setQuery("");
+        setResults([]);
+      }, 0);
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isOpen, query]);
 
   const handleSelect = (file: VaultFile) => {
