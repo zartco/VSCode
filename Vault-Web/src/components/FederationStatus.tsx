@@ -57,7 +57,16 @@ export default function FederationStatus() {
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label="Open Federation Control Plane"
       onClick={() => setDrawerOpen(true)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setDrawerOpen(true);
+        }
+      }}
       style={{
         display: "flex",
         flexDirection: "row",
