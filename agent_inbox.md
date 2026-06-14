@@ -1,3 +1,13 @@
+# Git Steward Handoff - 2026-06-14
+
+## Significant Change
+- Fixed Vault-Web live telemetry parsing for the Federation control plane SSE contract.
+- The backend emits `kind`-based messages (`agent_upsert`, `task_upsert`, `event`, `heartbeat`); Vault-Web now parses that shape through `src/lib/federation-sse.ts`.
+- Added focused parser tests in `Vault-Web/src/lib/federation-sse.test.ts`.
+
+## Re-entry Point
+- Validate the full local loop: start Federation core, start Vault-Web, send an ingest event, and confirm both `FED_LINK` and `AgentSwarmFlow` display live telemetry.
+
 # Daily Digest - Workspace Evolution (2026-06-13)
 
 ## CS Concepts Touched

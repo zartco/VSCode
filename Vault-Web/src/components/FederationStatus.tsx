@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { Activity } from "lucide-react";
 import { useFederationStore } from "../lib/store";
+import { parseFederationSseMessage } from "../lib/federation-sse";
 
 export default function FederationStatus() {
-  const { status, setStatus, addEvent, setAgents, setDrawerOpen } =
+  const { status, setStatus, addEvent, updateAgent, setDrawerOpen } =
     useFederationStore();
   const [lastEvent, setLastEvent] = useState<string>("Initializing...");
 
@@ -19,28 +20,21 @@ export default function FederationStatus() {
     };
 
     sse.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "event" && data.payload?.content) {
-          const content = data.payload.content;
-          const msg =
-            content.substring(0, 30) + (content.length > 30 ? "..." : "");
-          setLastEvent(msg);
-          addEvent(content);
-        } else if (data.type === "connected") {
-          setLastEvent("Stream initialized");
-          addEvent("Stream initialized");
-        } else if (data.type === "agent_status") {
-          // Attempt to parse agents if provided in payload
-          if (Array.isArray(data.payload?.agents)) {
-            setAgents(data.payload.agents);
-          }
-        } else if (data.agents && Array.isArray(data.agents)) {
-          // If the payload has a direct agents array
-          setAgents(data.agents);
-        }
-      } catch {
-        // ignore parse errors
+      const update = parseFederationSseMessage(event.data);
+      if (!update) return;
+
+      if (update.kind === "event") {
+        const msg =
+          update.content.substring(0, 30) +
+          (update.content.length > 30 ? "..." : "");
+        setLastEvent(msg);
+        addEvent(update.content);
+      } else if (update.kind === "agent_upsert") {
+        updateAgent(update.agent);
+        setLastEvent(`${update.agent.name ?? update.agent.id} synced`);
+      } else if (update.kind === "task_upsert") {
+        setLastEvent(update.description);
+        addEvent(update.description);
       }
     };
 
@@ -53,7 +47,7 @@ export default function FederationStatus() {
     return () => {
       sse.close();
     };
-  }, [setStatus, addEvent, setAgents]);
+  }, [setStatus, addEvent, updateAgent]);
 
   return (
     <div

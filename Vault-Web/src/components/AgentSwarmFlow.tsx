@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { Terminal, Cpu, Play } from "lucide-react";
+import { parseFederationSseMessage } from "../lib/federation-sse";
 
 interface LogEntry {
   id: string;
@@ -86,23 +87,19 @@ export default function AgentSwarmFlow() {
     };
 
     sse.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === "event" && data.payload?.content) {
-          // Attempt to extract an agent name if available, else default to Agent
-          const agentName =
-            data.payload.agent ||
-            data.payload.source ||
-            "Agent-" +
-              Math.floor(Math.random() * 1000)
-                .toString()
-                .substring(0, 3);
-          addLog(agentName, data.payload.content, "agent");
-        } else if (data.type === "connected") {
-          addLog("SYSTEM", "Agent stream synchronized.", "system");
-        }
-      } catch {
-        // ignore parse errors
+      const update = parseFederationSseMessage(event.data);
+      if (!update) return;
+
+      if (update.kind === "event") {
+        addLog(update.agentName, update.content, "agent");
+      } else if (update.kind === "agent_upsert") {
+        addLog(
+          "SYSTEM",
+          `${update.agent.name ?? update.agent.id} telemetry synchronized.`,
+          "system",
+        );
+      } else if (update.kind === "task_upsert") {
+        addLog("SYSTEM", update.description, "system");
       }
     };
 
