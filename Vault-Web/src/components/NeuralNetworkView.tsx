@@ -21,7 +21,7 @@ export default function NeuralNetworkView({ files }: { files: VaultFile[] }) {
         <OrbitControls autoRotate autoRotateSpeed={0.5} enablePan={false} maxDistance={30} minDistance={5} />
         
         {/* Postprocessing for mind-blowing bloom effect */}
-        <EffectComposer disableNormalPass>
+        <EffectComposer enableNormalPass={false}>
           <Bloom 
             luminanceThreshold={0.2} 
             mipmapBlur 
