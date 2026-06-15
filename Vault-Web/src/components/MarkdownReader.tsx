@@ -10,7 +10,7 @@ interface MarkdownReaderProps {
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
 
-export default function MarkdownReader({
+const MarkdownReader = function MarkdownReader({
   file,
   renderBlockquote,
 }: MarkdownReaderProps) {
@@ -174,3 +174,6 @@ export default function MarkdownReader({
     </div>
   );
 }
+
+// ⚡ Bolt: Wrapped in React.memo to prevent expensive ReactMarkdown re-parsing on parent VaultApp state changes.
+export default React.memo(MarkdownReader);
