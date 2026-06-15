@@ -14,3 +14,17 @@
 ## Watch Tomorrow
 - Begin implementing the `Federated Agent Control Plane` Phase 1.
 - Antigravity spike needed to locate the `agy` transcripts path to build the Antigravity Collector.
+
+---
+
+# Git Steward Re-entry Note - 2026-06-15
+
+## What Changed
+- Added focused `Federation/core` tests for file listing, subagent creation, and vault ingest.
+- Fixed `Federation/core` strict TypeScript breakage in `/ingest/vault`.
+- Fixed Vault-Web 3D neural view build errors in React Three Fiber/postprocessing usage.
+- Replaced or added project docs for `neural-net-3d-prototype`, `snake_game`, and `Llama-Finetune-Prep`.
+
+## Watch Next
+- `antigravity-cli/.env` and `antigravity-cli/debug.log` contain an Antigravity CSRF token and local service address. Rotate the token and remove those files from version control before treating the CLI as safe to share.
+- Checked-in `node_modules` trees are platform-specific; Linux verification needed temporary package installs because Windows binaries were present.

@@ -22,7 +22,10 @@ A unified, continuously evolving repository tracking a four-year computer scienc
 ```
 CS50/                  → Python & HTML exercises from CS50
 Federation/            → Fastify API & telemetry collectors for multi-agent observability
+Llama-Finetune-Prep/   → Obsidian-to-JSONL dataset prep for ML fine-tuning practice
+neural-net-3d-prototype/ → React Three Fiber prototype for neural-network visualization
 Precalculus/           → Notes and coursework tracking for WGU Precalculus
+snake_game/            → Pygame implementation of classic Snake mechanics
 Vault-Web/             → Next.js dashboard bridging code execution and the Obsidian Vault
 Youtube-Downloader/    → Windows desktop app for downloading videos/playlists
 ```

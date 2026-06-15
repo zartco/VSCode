@@ -1,16 +1,34 @@
-# React + Vite
+# 3D Neural Network Prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is a standalone React/Vite sketch for visualizing a neural network in WebGL. It is intentionally small: the goal is to practice graphics programming concepts before folding similar ideas back into the Vault-Web dashboard.
 
-Currently, two official plugins are available:
+## Learning Context
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Course / concept:** Computer graphics, graph visualization, and neural-network intuition.
+- **What it demonstrates:** React Three Fiber scene composition, layered node layout, animated data-flow particles, bloom postprocessing, and camera controls.
+- **Portfolio role:** A visual prototype for explaining connected systems, not a trained machine-learning model.
 
-## React Compiler
+## How It Works
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `src/App.jsx` creates the full-screen Three.js canvas, lights, orbit controls, and dashboard overlay.
+- `src/NeuralNetwork.jsx` defines four static layers, creates nodes with randomized depth offsets, connects adjacent layers, and animates particles along those connections.
+- CSS files provide the glass-panel UI and dark visual theme around the canvas.
 
-## Expanding the ESLint configuration
+## Run It
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm install
+npm run dev
+```
+
+Build check:
+
+```bash
+npm run build
+```
+
+## Known Limitations
+
+- Node positions and displayed activation/bias values are randomized on load, so this is not deterministic.
+- The visualization is conceptual only; it does not run inference or train a model.
+- The production bundle is large because the prototype ships Three.js and postprocessing in one entry point.
