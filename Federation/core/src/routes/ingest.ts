@@ -55,7 +55,7 @@ export async function ingestRoutes(app: FastifyInstance) {
   });
 
   // Ingest Obsidian vault modifications
-  app.post<{ Body: any }>('/ingest/vault', async (req, reply) => {
+  app.post<{ Body: { action?: string; filePath?: string } }>('/ingest/vault', async (req, reply) => {
     const payload = req.body;
     console.log(`[Federation Core] Received vault modification:`, payload.action, payload.filePath);
     // Broadcast or store the vault modification event
