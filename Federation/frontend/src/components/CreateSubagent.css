@@ -1,0 +1,76 @@
+.create-subagent {
+  padding: 32px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  max-width: 600px;
+  margin: 32px auto;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.subagent-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.subagent-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent-matrix);
+}
+
+.subagent-form input,
+.subagent-form select,
+.subagent-form textarea {
+  padding: 12px;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-0);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  transition: all 0.2s ease;
+}
+
+.subagent-form input:focus,
+.subagent-form select:focus,
+.subagent-form textarea:focus {
+  outline: none;
+  border-color: var(--accent-matrix);
+  box-shadow: 0 0 10px rgba(0,255,0,0.1);
+}
+
+.subagent-form button {
+  padding: 12px;
+  background: rgba(0,255,0,0.1);
+  color: var(--accent-matrix);
+  border: 1px solid var(--accent-matrix);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.subagent-form button:hover {
+  background: var(--accent-matrix);
+  color: var(--bg-0);
+  box-shadow: 0 0 15px rgba(0,255,0,0.3);
+}
+
+.status-msg {
+  margin-top: 20px;
+  padding: 12px;
+  background: rgba(16,185,129,0.1);
+  border: 1px solid var(--accent-green);
+  color: var(--accent-green);
+  border-radius: 0;
+  text-align: center;
+  font-weight: 700;
+}

@@ -1,8 +1,16 @@
 # Zartco's Computer Science Workspace
 
+```text
+  _____            _                  
+ |_  /_ _ _ _ _ __| |_ ___ ___ 
+  / / _` | '_|  _/  _/ _ \/ __|
+ /__\__,_|_|  \__|\__\___/\___|
+  W O R K S P A C E  [ v2.1 ]
+```
+
 A unified, continuously evolving repository tracking a four-year computer science degree. Currently, it houses my CS50 coursework exercises, a fully featured YouTube downloader desktop application, and the early stages of a Federated Agent Control Plane for AI orchestration.
 
-> **Note:** The definitive, interactive documentation and agent handoff payloads are managed within a local **Obsidian Vault** (`[LOCAL_VAULT_PATH]`). This README provides a high-level overview for GitHub.
+> **Note:** The definitive, interactive documentation and agent handoff payloads are managed within a local **Obsidian Vault** (`C:\Users\Zartc\Vault`). This README provides a high-level overview for GitHub.
 
 > **Showcase:** View the structured academic and engineering progression in the [Portfolio Showcase](PORTFOLIO.md).
 
@@ -23,6 +31,13 @@ Youtube-Downloader/    → Windows desktop app for downloading videos/playlists
 
 ## 1. CS50 Exercises
 
+```text
+   ___  ___ ___   ___ 
+  / __|/ __| __| / _ \
+ | (__ \__ \__ \| (_) |
+  \___||___/___/ \___/
+```
+
 Python and HTML scripts written while working through [CS50's Introduction to Programming with Python](https://cs50.harvard.edu/python/).
 Each script is isolated and demonstrates core programming concepts.
 
@@ -32,6 +47,13 @@ For detailed information, refer to the [CS50 README](CS50/README.md).
 
 ## 2. YouTube Downloader
 
+```text
+  __   _____   ___   ___ _    ___   _   ___  ___ ___ 
+  \ \ / /_ _| |   \ / _ \ |  | _ \ /_\ |   \| __| _ \
+   \ V / | |  | |) | (_) | |__|   // _ \| |) | _||   /
+    |_| |___| |___/ \___/|____|_|_/_/ \_\___/|___|_|_\
+```
+
 A resilient Windows desktop application for downloading YouTube videos and playlists, built with `tkinter`, `yt-dlp`, and `ffmpeg`.
 
 For architecture details, execution instructions, and distribution formats, refer to the [YouTube Downloader README](Youtube-Downloader/README.md).
@@ -39,6 +61,13 @@ For architecture details, execution instructions, and distribution formats, refe
 ---
 
 ## 3. Vault-Web & Federation
+
+```text
+  __   __  _   _ _  _____   __      _____ ___   __      ___ ___ ___ 
+  \ \ / /_/_\ | | |/ _ \ \ / /_____/  __// __| /_\ ___ / __| __|   \
+   \ V // _ \ | | | (_) \ V /_____|  (_  | _| / _ \___| (_ | _|| |) |
+    \_//_/ \_\|_|_|\___/ \_/      \____/|___/_/ \_\   \___|___|___/
+```
 
 The workspace has evolved into a multi-agent orchestrated setup where an autonomous cloud VM (Jules) and a local orchestrator (Antigravity) collaboratively manage the codebase.
 

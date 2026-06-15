@@ -1,20 +1,35 @@
+/*
+ * ══════════════════════════════════════════════════════════════════════════════
+ *   ______ ______ ____   ______ ____   ___  ______ ____ ___  _  _
+ *   |  ___||  ____||  \  |  ___||  _ \ / _ \|_   _||_  // _ \| \| |
+ *   |  ___||  ___| | | | |  ___||    /|  _  | | |   | ||  _  | .` |
+ *   |_|    |______||__/  |______||_|\_\|_| |_| |_|  |___|_| |_|_|\_|
+ *
+ *   FEDERATION OBSERVE PANEL - CLIENT INTERFACE
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
 import { useState, useEffect, useCallback } from 'react'
 import type { AgentNode, TaskNode, AgentEvent, SseMessage, ApiResponse } from '@contracts'
-import { mockAgents, mockTasks, mockEvents } from './mock/data'
+// Removed mock data import
 import { AgentList } from './components/AgentList'
 import { TaskTree } from './components/TaskTree'
 import { EventFeed } from './components/EventFeed'
+import { CreateSubagent } from './components/CreateSubagent'
+import { SubagentList } from './components/SubagentList'
+import { ObsidianView } from './components/ObsidianView'
 import './App.css'
 
 const API_BASE = 'http://127.0.0.1:3001'
 const SSE_URL = `${API_BASE}/events/stream`
 
 export default function App() {
-  const [agents, setAgents] = useState<AgentNode[]>(mockAgents)
-  const [tasks, setTasks] = useState<TaskNode[]>(mockTasks)
-  const [events, setEvents] = useState<AgentEvent[]>(mockEvents)
+  const [agents, setAgents] = useState<AgentNode[]>([])
+  const [tasks, setTasks] = useState<TaskNode[]>([])
+  const [events, setEvents] = useState<AgentEvent[]>([])
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null)
   const [sseStatus, setSseStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting')
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'library' | 'deployed' | 'create' | 'obsidian'>('dashboard')
 
   // Fetch real data on mount; fall back to mock data silently if backend is unreachable
   useEffect(() => {
@@ -37,8 +52,9 @@ export default function App() {
 
         setAgents(agentsJson.data)
         setEvents(eventsJson.data)
-      } catch {
-        // Backend unreachable — keep mock data
+      } catch (err) {
+        // Backend unreachable — keep empty state
+        console.error('Backend unreachable:', err)
       }
     }
 
@@ -135,33 +151,56 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1 className="app-title">Federated Agent Control Plane</h1>
+        <div className="app-title-container">
+          <h1 className="app-title">Federated Agent Control Plane</h1>
+          <div className="terminal-prompt">
+            <span className="terminal-prompt-symbol">&gt;_</span>
+            <span className="terminal-prompt-user">root@strigiformes-os:~</span>
+            <span className="terminal-prompt-symbol">|</span>
+            <span style={{color: "var(--accent-matrix)"}}>FED_LINK</span>
+          </div>
+        </div>
+        <nav className="app-nav">
+          <button className={activeTab === 'dashboard' ? 'active' : ''} onClick={() => setActiveTab('dashboard')}>Dashboard</button>
+          <button className={activeTab === 'library' ? 'active' : ''} onClick={() => setActiveTab('library')}>Library</button>
+          <button className={activeTab === 'deployed' ? 'active' : ''} onClick={() => setActiveTab('deployed')}>Deployed</button>
+          <button className={activeTab === 'create' ? 'active' : ''} onClick={() => setActiveTab('create')}>Create New</button>
+          <button className={activeTab === 'obsidian' ? 'active' : ''} onClick={() => setActiveTab('obsidian')}>Obsidian Vault</button>
+        </nav>
         <div className={`sse-indicator sse-indicator--${sseStatus}`} title={`SSE: ${sseStatus}`}>
           <span className="sse-dot" />
-          <span className="sse-label">{sseStatus}</span>
+          <span className="sse-label">{sseStatus === 'connected' ? 'CONNECTED' : sseStatus.toUpperCase()}</span>
         </div>
       </header>
-      <main className="app-panels">
-        <div className="panel panel--left">
-          <AgentList
-            agents={agents}
-            events={events}
-            selectedAgentId={selectedAgentId}
-            onSelect={setSelectedAgentId}
-          />
-        </div>
-        <div className="panel panel--middle">
-          <TaskTree
-            tasks={tasks}
-            selectedAgentId={selectedAgentId}
-          />
-        </div>
-        <div className="panel panel--right">
-          <EventFeed
-            events={events}
-            selectedAgentId={selectedAgentId}
-          />
-        </div>
+      <main className="app-main-content">
+        {activeTab === 'dashboard' && (
+          <div className="app-panels">
+            <div className="panel panel--left">
+              <AgentList
+                agents={agents}
+                events={events}
+                selectedAgentId={selectedAgentId}
+                onSelect={setSelectedAgentId}
+              />
+            </div>
+            <div className="panel panel--middle">
+              <TaskTree
+                tasks={tasks}
+                selectedAgentId={selectedAgentId}
+              />
+            </div>
+            <div className="panel panel--right">
+              <EventFeed
+                events={events}
+                selectedAgentId={selectedAgentId}
+              />
+            </div>
+          </div>
+        )}
+        {activeTab === 'library' && <SubagentList endpoint="/api/subagents/library" title="Global Subagent Library" />}
+        {activeTab === 'deployed' && <SubagentList endpoint="/api/subagents/deployed" title="Deployed Subagents" />}
+        {activeTab === 'create' && <CreateSubagent />}
+        {activeTab === 'obsidian' && <ObsidianView />}
       </main>
     </div>
   )

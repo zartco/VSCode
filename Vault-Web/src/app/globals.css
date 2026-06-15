@@ -1,20 +1,20 @@
 :root {
-  --bg-color: #0a0a0a;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --accent: #2a8bd6;
-  --accent-glow: rgba(42, 139, 214, 0.4);
-  --glass-bg: #1a1a1a;
-  --glass-border: #333;
-  --glass-hover: #222;
-  --callout-info: rgba(0, 255, 255, 0.15);
-  --callout-info-border: rgba(0, 255, 255, 0.5);
-  --callout-success: rgba(74, 222, 128, 0.15);
-  --callout-success-border: rgba(74, 222, 128, 0.5);
-  --callout-warning: rgba(250, 204, 21, 0.15);
-  --callout-warning-border: rgba(250, 204, 21, 0.5);
-  --callout-error: rgba(248, 113, 113, 0.15);
-  --callout-error-border: rgba(248, 113, 113, 0.5);
+  --bg-color: #000000;
+  --text-primary: #00ff00;
+  --text-secondary: #00cc00;
+  --accent: #00ff00;
+  --accent-glow: rgba(0, 255, 0, 0.4);
+  --glass-bg: #030303;
+  --glass-border: #003300;
+  --glass-hover: #000000;
+  --callout-info: rgba(0, 255, 0, 0.15);
+  --callout-info-border: rgba(0, 255, 0, 0.5);
+  --callout-success: rgba(0, 255, 0, 0.15);
+  --callout-success-border: rgba(0, 255, 0, 0.5);
+  --callout-warning: rgba(0, 255, 0, 0.15);
+  --callout-warning-border: rgba(0, 255, 0, 0.5);
+  --callout-error: rgba(0, 255, 0, 0.15);
+  --callout-error-border: rgba(0, 255, 0, 0.5);
 }
 
 body {
@@ -37,7 +37,7 @@ body {
 
 .glass-panel:hover {
   background: var(--glass-hover);
-  border-color: #2a8bd6;
+  border-color: #00ff00;
 }
 
 /* Layout */
@@ -46,7 +46,7 @@ body {
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  background-color: #0a0a0a;
+  background-color: #000000;
 }
 
 .sidebar {
@@ -59,14 +59,14 @@ body {
   flex-direction: column;
   gap: 16px;
   overflow-y: auto;
-  background-color: #1a1a1a;
-  border: 1px solid #333;
+  background-color: #030303;
+  border: 1px solid #003300
 }
 
 .sidebar-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #00ffff;
+  color: #00ff00;
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -93,16 +93,16 @@ body {
 }
 
 .folder-item:hover {
-  background: #1a1a1a;
+  background: #030303;
   color: var(--text-primary);
-  border-color: #2a8bd6;
+  border-color: #00ff00;
   transform: translateX(4px);
 }
 
 .folder-item.active {
-  background: rgba(42, 139, 214, 0.1);
-  color: #00ffff;
-  border-color: #2a8bd6;
+  background: rgba(0, 255, 0, 0.1);
+  color: #00ff00;
+  border-color: #00ff00;
 }
 
 .file-list {
@@ -126,15 +126,15 @@ body {
 }
 
 .file-item:hover {
-  background: #1a1a1a;
+  background: #030303;
   color: var(--text-primary);
-  border-color: #333;
+  border-color: #003300
 }
 
 .file-item.active {
-  color: #00ffff;
-  background: rgba(0, 255, 255, 0.1);
-  border-color: #00ffff;
+  color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+  border-color: #00ff00;
 }
 
 .main-content {
@@ -144,8 +144,8 @@ body {
   padding: 32px 48px;
   overflow-y: auto;
   position: relative;
-  background-color: #0a0a0a;
-  border: 1px solid #333;
+  background-color: #000000;
+  border: 1px solid #003300
 }
 
 /* Markdown Styles */
@@ -179,13 +179,13 @@ body {
   margin-top: 2em;
   margin-bottom: 0.75em;
   font-weight: 700;
-  color: #fff;
+  color: #00ff00
   letter-spacing: -0.02em;
 }
 
 .markdown-body h1 {
   font-size: 2.5rem;
-  color: #00ffff;
+  color: #00ff00;
   margin-top: 0;
 }
 
@@ -200,21 +200,21 @@ body {
 }
 
 .markdown-body a {
-  color: #38bdf8;
+  color: #00ff00;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s ease;
 }
 
 .markdown-body a:hover {
-  border-color: #38bdf8;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+  border-color: #00ff00;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
 }
 
 /* Code Blocks */
 .markdown-body pre {
-  background: #1a1a1a;
-  border: 1px solid #333;
+  background: #030303;
+  border: 1px solid #003300
   border-radius: 0;
   padding: 16px;
   overflow-x: auto;
@@ -244,7 +244,7 @@ body {
   padding: 16px 20px;
   border-radius: 0;
   background: var(--glass-bg);
-  border: 1px solid #333;
+  border: 1px solid #003300
   border-left: 4px solid var(--text-secondary);
 }
 
@@ -258,7 +258,7 @@ body {
   padding: 16px 20px;
   border-radius: 0;
   background: var(--glass-bg);
-  border: 1px solid #333;
+  border: 1px solid #003300
   border-left: 4px solid var(--accent);
   display: flex;
   flex-direction: column;
@@ -274,11 +274,11 @@ body {
 }
 
 .callout[data-type="note"] {
-  border-left-color: #38bdf8;
+  border-left-color: #00ff00;
   background: var(--callout-info);
 }
 .callout[data-type="note"] .callout-title {
-  color: #38bdf8;
+  color: #00ff00;
 }
 
 .callout[data-type="warning"] {
@@ -492,8 +492,8 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #0a0a0a;
-  border: 1px solid #333;
+  background: #000000;
+  border: 1px solid #003300
   border-radius: 0;
   overflow: hidden;
   position: relative;
@@ -504,8 +504,8 @@ body {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: #1a1a1a;
-  border-bottom: 1px solid #333;
+  background: #030303;
+  border-bottom: 1px solid #003300
   z-index: 10;
 }
 
@@ -604,10 +604,10 @@ body {
 
 /* Agent Colors */
 .agent-1 {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.1);
-  border-color: rgba(56, 189, 248, 0.3);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  color: #00ff00;
+  background: rgba(0, 255, 0, 0.1);
+  border-color: rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
 }
 .agent-2 {
   color: #a78bfa;
@@ -693,8 +693,8 @@ body {
 
 .file-card:hover {
   transform: translateY(-4px);
-  background: #1a1a1a;
-  border-color: #2a8bd6;
+  background: #030303;
+  border-color: #00ff00;
   box-shadow: none;
 }
 
@@ -713,7 +713,7 @@ body {
   padding: 24px 24px 0 24px;
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: #00ff00
   letter-spacing: -0.02em;
   margin-bottom: 8px;
 }

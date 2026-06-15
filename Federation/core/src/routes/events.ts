@@ -34,6 +34,7 @@ export async function eventsRoutes(app: FastifyInstance) {
     reply.raw.setHeader('Content-Type', 'text/event-stream');
     reply.raw.setHeader('Cache-Control', 'no-cache');
     reply.raw.setHeader('Connection', 'keep-alive');
+    reply.raw.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     reply.raw.flushHeaders();
 
     addClient(reply.raw);

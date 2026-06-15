@@ -1,0 +1,10 @@
+{
+  "id": "obsidian-federation-sync",
+  "name": "Federation Sync",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Real-time synchronization of Vault metadata to a Federation database.",
+  "author": "Zartc",
+  "authorUrl": "",
+  "isDesktopOnly": true
+}

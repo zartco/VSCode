@@ -1,0 +1,10 @@
+{
+  "name": "antigravity-cli",
+  "version": "1.0.0",
+  "description": "Matrix-themed CLI for Antigravity Agent",
+  "main": "cli.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node cli.mjs"
+  }
+}

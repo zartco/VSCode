@@ -9,6 +9,8 @@ export interface VaultFile {
   content: string;
   tags?: string[];
   metadata?: Record<string, unknown>;
+  createdAt?: number;
+  modifiedAt?: number;
 }
 
 export interface VaultFolder {
@@ -61,6 +63,8 @@ export function getVaultFiles(dirPath: string = VAULT_DIR): VaultFile[] {
           content: parsed.content, // only the raw markdown body
           metadata: parsed.data,
           tags,
+          createdAt: stat.birthtimeMs,
+          modifiedAt: stat.mtimeMs,
         });
       }
     }

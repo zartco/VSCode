@@ -8,7 +8,7 @@ interface Props {
 
 function TaskStatusDot({ status }: { status: TaskNode['status'] }) {
   const color =
-    status === 'running'   ? 'var(--accent-blue)'   :
+    status === 'running'   ? 'var(--accent-matrix)'   :
     status === 'completed' ? 'var(--accent-green)'  :
     status === 'failed'    ? 'var(--accent-red)'    :
                              'var(--text-muted)'
@@ -35,7 +35,7 @@ function TaskRow({ task, depth, allTasks }: TaskRowProps) {
     <>
       <li
         className="task-row"
-        style={{ paddingLeft: `${12 + depth * 20}px` }}
+        style={{ paddingLeft: `${12 + depth * 20}px`, '--depth-padding': `${12 + depth * 20}px` } as React.CSSProperties}
       >
         <TaskStatusDot status={task.status} />
         <div className="task-row__body">

@@ -1,6 +1,18 @@
+/*
+ * ══════════════════════════════════════════════════════════════════════════════
+ *    _   ___   __  ___ ___  _    _     ___ ___ _____ ___  ___  
+ *   /_\ / __|  \ \/ / | _ \/_\  | |   | __/ __|_   _/ _ \| _ \ 
+ *  / _ \ (_ |   \  /  |  _/ _ \ | |__ | _| (__  | || (_) |   / 
+ * /_/ \_\___|   /_/   |_|/_/ \_\|____||___\___| |_| \___/|_|_\ 
+ *
+ *   TELEMETRY COLLECTOR: ANTIGRAVITY AGENT
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
 import chokidar from 'chokidar';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
+import { stat } from 'node:fs/promises';
 import { readSession, readNewSteps } from './reader.js';
 import { upsertAgent, emitEvent } from './emitter.js';
 import type { AgentNode } from '../../../contracts/types.js';
@@ -22,7 +34,7 @@ async function processDb(dbPath: string): Promise<void> {
       const agent: AgentNode = {
         ...meta,
         status: 'active',
-        lastSeenAt: new Date().toISOString(),
+        lastSeenAt: (await stat(dbPath)).mtime.toISOString(),
       };
       agents.set(dbPath, agent);
       await upsertAgent(agent);
@@ -42,7 +54,7 @@ async function processDb(dbPath: string): Promise<void> {
     // Update lastSeenAt on the agent
     const agent = agents.get(dbPath);
     if (agent) {
-      agent.lastSeenAt = new Date().toISOString();
+      agent.lastSeenAt = (await stat(dbPath)).mtime.toISOString();
       agent.status = 'active';
       await upsertAgent(agent);
     }
@@ -57,7 +69,7 @@ setInterval(async () => {
     const lastSeen = new Date(agent.lastSeenAt);
     const diffMs = now.getTime() - lastSeen.getTime();
     
-    let newStatus = agent.status;
+    let newStatus: AgentNode['status'] = agent.status;
     if (diffMs > 24 * 60 * 60 * 1000) {
       newStatus = 'stopped';
     } else if (diffMs > 5 * 60 * 1000) {
@@ -73,7 +85,7 @@ setInterval(async () => {
 
 const watcher = chokidar.watch([AGY_DIR, AGY_IDE_DIR], {
   persistent: true,
-  ignoreInitial: false,
+  ignoreInitial: true,
   depth: 0,
   awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
 });
@@ -84,6 +96,11 @@ watcher.on('add', (path) => { if (isDb(path)) processDb(path).catch(console.erro
 watcher.on('change', (path) => { if (isDb(path)) processDb(path).catch(console.error); });
 watcher.on('error', (err) => console.error('[agy] watcher error:', err));
 
+console.log(`
+\x1b[1m\x1b[38;2;0;255;0m  ┌──────────────────────────────────────────────────┐
+  │  📡  TELEMETRY COLLECTOR: ANTIGRAVITY [ACTIVE]   │
+  └──────────────────────────────────────────────────┘\x1b[0m
+`);
 console.log(`[agy-collector] watching ${AGY_DIR}`);
 console.log(`[agy-collector] watching ${AGY_IDE_DIR}`);
 
@@ -93,7 +110,7 @@ setInterval(async () => {
   for (const agent of agents.values()) {
     const lastSeen = new Date(agent.lastSeenAt).getTime();
     const diff = now - lastSeen;
-    let newStatus = agent.status;
+    let newStatus: AgentNode['status'] = agent.status;
     
     if (diff > 24 * 60 * 60 * 1000) newStatus = 'stopped';
     else if (diff > 5 * 60 * 1000) newStatus = 'idle';

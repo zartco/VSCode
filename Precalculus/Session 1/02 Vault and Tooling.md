@@ -1,6 +1,6 @@
 # Vault & Tooling
 
-**Vault:** `C:\VSCode\Precalculus\WGU Precalculus Vault` (open in Obsidian; the user's other vault "Vault" at `C:\Users\Zartc` is separate and unrelated).
+**Vault:** `C:\Users\Zartc\Vault` (open in Obsidian).
 
 **Structure:**
 - `Modules/` — M01–M14. **M01 Algebraic Expressions** + **M02 Solving Equations** = full lessons; M03–M14 = outlines (objectives, OpenStax readings, subtopics, links). M03/M04 named "M03 Functions Part 1" / "M04 Functions Part 2".

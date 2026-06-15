@@ -1,3 +1,14 @@
+/*
+ * ══════════════════════════════════════════════════════════════════════════════
+ *    ___ _      _   _   _ ___  ___   ___  _    _     ___ ___ _____ ___  ___  
+ *   / __| |    /_\ | | | |   \| __| / __|/_\  | |   | __/ __|_   _/ _ \| _ \ 
+ *  | (__| |__ / _ \| |_| | |) | _| | (__/ _ \ | |__ | _| (__  | || (_) |   / 
+ *   \___|____/_/ \_\\___/|___/|___| \___/_/ \_\|____||___\___| |_| \___/|_|_\ 
+ *
+ *   TELEMETRY COLLECTOR: CLAUDE AGENT
+ * ══════════════════════════════════════════════════════════════════════════════
+ */
+
 import chokidar from 'chokidar';
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
@@ -75,7 +86,7 @@ async function processFile(filePath: string, isNew: boolean): Promise<void> {
         id: agentId,         // override with the resolved agentId (subagent-aware)
         sessionId,
         status: 'active',
-        lastSeenAt: new Date().toISOString(),
+        lastSeenAt: (await stat(filePath)).mtime.toISOString(),
       };
       agents.set(agentId, agent);
       await upsertAgent(agent);
@@ -126,7 +137,7 @@ async function processFile(filePath: string, isNew: boolean): Promise<void> {
   // Update lastSeenAt
   const agent = agents.get(agentId);
   if (agent) {
-    agent.lastSeenAt = new Date().toISOString();
+    agent.lastSeenAt = (await stat(filePath)).mtime.toISOString();
     await upsertAgent(agent);
   }
 }
@@ -134,7 +145,7 @@ async function processFile(filePath: string, isNew: boolean): Promise<void> {
 // Watch the directory directly — chokidar v4 glob patterns are unreliable on Windows
 const watcher = chokidar.watch(CLAUDE_DIR, {
   persistent: true,
-  ignoreInitial: false,
+  ignoreInitial: true,
   depth: 3,
   awaitWriteFinish: { stabilityThreshold: 200, pollInterval: 50 },
 });
@@ -160,7 +171,7 @@ setInterval(() => {
     
     const lastSeen = new Date(agent.lastSeenAt).getTime();
     const elapsed = now - lastSeen;
-    let newStatus = agent.status;
+    let newStatus: AgentNode['status'] = agent.status;
     
     if (elapsed > 24 * 60 * 60 * 1000) {
       newStatus = 'stopped';
@@ -175,4 +186,9 @@ setInterval(() => {
   }
 }, 60 * 1000);
 
+console.log(`
+\x1b[1m\x1b[38;2;0;255;180m  ┌──────────────────────────────────────────────────┐
+  │  📡  TELEMETRY COLLECTOR: CLAUDE-AGENT [ACTIVE]  │
+  └──────────────────────────────────────────────────┘\x1b[0m
+`);
 console.log(`[claude-collector] watching ${CLAUDE_DIR}`);

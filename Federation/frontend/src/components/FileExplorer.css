@@ -1,0 +1,92 @@
+.file-explorer {
+  padding: 32px;
+  background: var(--bg-1);
+  border: 1px solid var(--border);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+}
+
+.explorer-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.explorer-header button {
+  padding: 8px 16px;
+  background: rgba(0,255,0, 0.1);
+  border: 1px solid var(--accent-matrix);
+  color: var(--accent-matrix);
+  border-radius: 0;
+  cursor: pointer;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.explorer-header button:hover:not(:disabled) {
+  background: var(--accent-matrix);
+  color: var(--bg-0);
+  box-shadow: 0 0 10px rgba(0,255,0,0.4);
+}
+
+.explorer-header button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.current-path {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent-matrix);
+  letter-spacing: 0.05em;
+}
+
+.file-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid transparent;
+  cursor: default;
+  transition: all 0.2s ease;
+}
+
+.file-item.directory {
+  cursor: pointer;
+}
+
+.file-item.directory:hover {
+  background: rgba(42, 139, 214, 0.1);
+  border-bottom: 1px solid var(--accent-matrix);
+  color: var(--accent-matrix);
+}
+
+.file-item .icon {
+  font-size: 1.2em;
+}
+
+.error-msg {
+  color: var(--accent-red);
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid var(--accent-red);
+  background: rgba(239, 68, 68, 0.1);
+}

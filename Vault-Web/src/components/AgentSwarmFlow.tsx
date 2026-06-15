@@ -239,7 +239,7 @@ export default function AgentSwarmFlow() {
             style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}
           >
             <div
-              style={{ color: "#00ffff", opacity: 0.8, whiteSpace: "nowrap" }}
+              style={{ color: "#00ff00", opacity: 0.8, whiteSpace: "nowrap" }}
             >
               [{log.timestamp}]
             </div>
@@ -254,7 +254,7 @@ export default function AgentSwarmFlow() {
             </div>
             <div
               style={{
-                color: log.type === "system" ? "#f59e0b" : "#00ffff",
+                color: log.type === "system" ? "#f59e0b" : "#00ff00",
                 flex: 1,
                 wordBreak: "break-word",
               }}

@@ -1,0 +1,14 @@
+{
+  "subagents": [
+    {
+      "id": "llama-standby-1",
+      "name": "llama-standby",
+      "description": "A local Llama 3 instance running on standby. Perfect for ad-hoc coding queries without API costs.",
+      "vendor": "ollama",
+      "commands": {
+        "start": "bash \"$AGENT_DIR/start.sh\" ollama llama-standby",
+        "resume": "bash \"$AGENT_DIR/resume.sh\" ollama llama-standby"
+      }
+    }
+  ]
+}

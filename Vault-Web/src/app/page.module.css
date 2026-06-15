@@ -1,6 +1,6 @@
 .page {
   --background: #fafafa;
-  --foreground: #fff;
+  --foreground: #00ff00
 
   --text-primary: #000;
   --text-secondary: #666;
@@ -136,7 +136,7 @@ a.secondary {
     --text-secondary: #999;
 
     --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+    --button-secondary-hover: #030303;
+    --button-secondary-border: #030303;
   }
 }

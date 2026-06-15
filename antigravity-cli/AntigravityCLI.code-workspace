@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "C:\\"
+    }
+  ],
+  "settings": {
+    "terminal.integrated.defaultLocation": "editor",
+    "terminal.integrated.profiles.windows": {
+      "Antigravity Terminal": {
+        "source": "PowerShell",
+        "overrideName": true,
+        "color": "terminal.ansiGreen",
+        "icon": "terminal-powershell",
+        "cwd": "C:\\VSCode\\antigravity-cli"
+      }
+    },
+    "terminal.integrated.defaultProfile.windows": "Antigravity Terminal",
+    "terminal.integrated.cwd": "C:\\VSCode\\antigravity-cli"
+  }
+}

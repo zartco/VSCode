@@ -9,47 +9,81 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  height: 44px;
-  background: var(--bg-1);
-  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 48px;
+  background: #000;
+  border-bottom: 1px solid var(--accent-matrix);
   flex-shrink: 0;
+  font-family: var(--font-mono);
+}
+
+.app-title-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .app-title {
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.terminal-prompt {
+  color: var(--accent-green);
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 24px;
+}
+
+.terminal-prompt-user {
+  color: var(--accent-green);
+}
+
+.terminal-prompt-symbol {
+  color: var(--text-secondary);
 }
 
 /* SSE status indicator */
 .sse-indicator {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
+  font-family: var(--font-mono);
 }
 
 .sse-dot {
   display: inline-block;
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
 }
 
 .sse-label {
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
+  font-weight: 700;
 }
 
-.sse-indicator--connecting .sse-dot  { background: var(--accent-yellow); }
-.sse-indicator--connected  .sse-dot  { background: var(--accent-green); }
-.sse-indicator--disconnected .sse-dot { background: var(--text-muted); }
+.sse-indicator--connecting .sse-dot  { background: var(--accent-yellow); box-shadow: 0 0 8px var(--accent-yellow); }
+.sse-indicator--connected  .sse-dot  { background: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); animation: pulse 2s infinite; }
+.sse-indicator--disconnected .sse-dot { background: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
 
 .sse-indicator--connecting  .sse-label { color: var(--accent-yellow); }
 .sse-indicator--connected   .sse-label { color: var(--accent-green); }
-.sse-indicator--disconnected .sse-label { color: var(--text-muted); }
+.sse-indicator--disconnected .sse-label { color: var(--accent-red); }
+
+@keyframes pulse {
+  0% { opacity: 0.8; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.8; transform: scale(0.95); }
+}
 
 /* Three-panel layout */
 .app-panels {
@@ -63,4 +97,42 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.app-main-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-nav {
+  display: flex;
+  gap: 16px;
+  margin-left: 32px;
+}
+
+.app-nav button {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 700;
+  padding: 8px 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 12px;
+  transition: all 0.2s ease;
+  border-bottom: 2px solid transparent;
+}
+
+.app-nav button:hover {
+  color: var(--text-primary);
+  text-shadow: 0 0 8px rgba(255,255,255,0.2);
+}
+
+.app-nav button.active {
+  color: var(--accent-matrix);
+  border-bottom: 2px solid var(--accent-matrix);
+  text-shadow: 0 0 10px rgba(0,255,0,0.4);
 }

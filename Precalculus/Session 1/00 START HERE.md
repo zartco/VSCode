@@ -4,7 +4,7 @@ A one-time, comprehensive context package from **Session 1** (Jun 12–13, 2026)
 
 **How to use (next session):** read this file, then the numbered notes in order.
 
-> **Status — Session 2 done (Jun 13 2026):** the project has **moved to `C:\VSCode\Precalculus`** (off OneDrive) and the **`_agents/` coordination framework is built**. For current state + resume steps, read **`WGU Precalculus Vault/_agents/RESUME.md`** first, then `_agents/PROTOCOL.md`. The numbered notes below remain the deeper reference. From here on, context updates go INTO the vault, not new Session folders.
+> **Status — Session 2 done (Jun 13 2026):** the project has **moved to `C:\VSCode\Precalculus`** (off OneDrive) and the **`_agents/` coordination framework is built**. For current state + resume steps, read **`C:\Users\Zartc\Vault\_agents\RESUME.md`** first, then `_agents/PROTOCOL.md`. The numbered notes below remain the deeper reference. From here on, context updates go INTO the vault, not new Session folders.
 
 **Contents**
 - `01 Project - WGU Precalculus` — state, timeline, module→OpenStax map, what's built/pending, paths

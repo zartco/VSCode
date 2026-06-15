@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart } from "lucide-react";
+import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -10,6 +10,8 @@ import FederationDrawer from "@/components/FederationDrawer";
 import FileExplorer from "@/components/FileExplorer";
 import MarkdownReader from "@/components/MarkdownReader";
 import VaultAnalytics from "@/components/VaultAnalytics";
+import TimelapseView from "@/components/TimelapseView";
+import NeuralNetworkView from "@/components/NeuralNetworkView";
 
 interface VaultAppProps {
   files: VaultFile[];
@@ -20,8 +22,8 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [activeFile, setActiveFile] = useState<VaultFile | null>(null);
   const [activeView, setActiveView] = useState<
-    "federation" | "folder" | "file" | "analytics"
-  >("federation");
+    "federation" | "folder" | "file" | "analytics" | "timelapse" | "3dnexus"
+  >("3dnexus");
 
   return (
     <div
@@ -54,7 +56,7 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           alignItems: "center",
           padding: "4px 16px",
           borderBottom: "1px solid #333",
-          background: "#0a0a0a",
+          background: "#000000",
           fontFamily: "monospace",
           fontSize: "0.85rem",
           color: "#10b981",
@@ -65,7 +67,7 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           style={{ display: "flex", alignItems: "center", gap: "8px" }}
         >
           <Terminal size={14} />
-          <span>root@vault-os:~</span>
+          <span>root@strigiformes-os:~</span>
         </div>
         <FederationStatus />
       </header>
@@ -102,9 +104,44 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
             className="sidebar-nav"
             style={{ padding: "16px", overflowY: "auto", flex: 1 }}
           >
-            <h1 className="sidebar-title">Vault</h1>
+            <h1 
+              className="sidebar-title"
+              style={{ cursor: "pointer" }}
+              onClick={() => {
+                setActiveFolder(null);
+                setActiveFile(null);
+                setActiveView("3dnexus");
+              }}
+              title="Return to 3D Nexus"
+            >
+              Vault
+            </h1>
 
             <div className="sidebar-nav">
+              <div
+                className={`folder-item ${activeView === "3dnexus" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveFolder(null);
+                  setActiveFile(null);
+                  setActiveView("3dnexus");
+                }}
+                style={{
+                  marginBottom: "8px",
+                  color:
+                    activeView === "3dnexus"
+                      ? "#10b981"
+                      : "var(--text-primary)",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "8px 12px",
+                }}
+              >
+                <Box size={18} />
+                <span>3D Nexus</span>
+              </div>
+
               <div
                 className={`folder-item ${activeView === "federation" ? "active" : ""}`}
                 onClick={() => {
@@ -154,6 +191,33 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
                 <BarChart size={18} />
                 <span>Vault Analytics</span>
               </div>
+
+              <div
+                className={`folder-item ${activeView === "timelapse" ? "active" : ""}`}
+                onClick={() => {
+                  setActiveFolder(null);
+                  setActiveFile(null);
+                  setActiveView("timelapse");
+                }}
+                style={{
+                  marginBottom: "16px",
+                  color:
+                    activeView === "timelapse"
+                      ? "#10b981"
+                      : "var(--text-primary)",
+                  borderBottom: "1px solid #333",
+                  paddingBottom: "12px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  padding: "8px 12px",
+                }}
+              >
+                <History size={18} />
+                <span>Vault Timelapse</span>
+              </div>
+
             </div>
 
             <div
@@ -260,6 +324,35 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
               }}
             >
               <VaultAnalytics files={files} />
+            </div>
+          ) : activeView === "timelapse" ? (
+            <div
+              className="os-window"
+              style={{
+                animation: "fadeIn 0.2s ease-out forwards",
+                border: "1px solid #333",
+                background: "#050505",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <TimelapseView files={files} />
+            </div>
+          ) : activeView === "3dnexus" ? (
+            <div
+              className="os-window"
+              style={{
+                animation: "fadeIn 0.2s ease-out forwards",
+                border: "1px solid #333",
+                background: "#050505",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                position: "relative"
+              }}
+            >
+              <NeuralNetworkView files={files} />
             </div>
           ) : activeView === "folder" && activeFolder ? (
             <div
