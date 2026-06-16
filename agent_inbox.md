@@ -14,3 +14,13 @@
 ## Watch Tomorrow
 - Begin implementing the `Federated Agent Control Plane` Phase 1.
 - Antigravity spike needed to locate the `agy` transcripts path to build the Antigravity Collector.
+
+# Daily Stewardship - 2026-06-16
+
+## Actions Logged
+- Created daily digest issue: https://github.com/zartco/VSCode/issues/48
+- Created security finding issue: https://github.com/zartco/VSCode/issues/49
+- Updated vulnerability memory with four new validated findings: Federation subagent path traversal write, Federation file explorer directory enumeration, Vault-Web vault disclosure, and Federation ingest state poisoning.
+
+## Where We Left Off
+- No commits landed in the last 24 hours, so no test or critical-bug PR was opened.
