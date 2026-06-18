@@ -14,3 +14,20 @@
 ## Watch Tomorrow
 - Begin implementing the `Federated Agent Control Plane` Phase 1.
 - Antigravity spike needed to locate the `agy` transcripts path to build the Antigravity Collector.
+
+# Daily Steward Handoff - 2026-06-18
+
+## Daily Digest
+- No commits landed in the last 24 hours.
+- Re-entry point: the vault and companion page remain the best places to restart after a gap.
+
+## Security Scan
+- New validated finding: `antigravity-cli/cli.mjs` builds `agentapi` calls with `execAsync` and `cmd /c`, so crafted CLI input can inject Windows shell commands.
+- Attack path: user-controlled `/connect` ID or chat text flows into the command string, then `cmd.exe` interprets metacharacters as the local user.
+- Recommended fix direction: replace shell-string execution with argument-array process spawning and validate `/connect` IDs before storing them.
+- Persistent vulnerability memory was updated with `antigravity-cli-shell-command-injection-2026-06-18`.
+
+## Test, Bug, And Docs Check
+- Test coverage: no action; no executable code was committed in the last 24 hours.
+- Bug detection: no action; no high-severity regression was introduced in the last 24 hours.
+- Documentation: skipped because today is Thursday, not Monday.
