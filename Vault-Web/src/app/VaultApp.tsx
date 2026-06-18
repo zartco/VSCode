@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
+import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -69,7 +69,37 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           <Terminal size={14} />
           <span>root@strigiformes-os:~</span>
         </div>
-        <FederationStatus />
+
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <button
+            onClick={() => window.dispatchEvent(new Event("open-search"))}
+            aria-label="Open search palette"
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              background: "transparent",
+              border: "none",
+              color: "#10b981",
+              cursor: "pointer",
+              padding: "4px 8px",
+              borderRadius: "4px",
+              transition: "background-color 0.2s"
+            }}
+            className="hover:bg-white/10"
+          >
+            <Search size={14} />
+            <span>Search</span>
+            <kbd style={{
+              background: "rgba(16, 185, 129, 0.2)",
+              padding: "2px 4px",
+              borderRadius: "4px",
+              fontSize: "0.7rem",
+              marginLeft: "4px"
+            }}>Ctrl+K</kbd>
+          </button>
+          <FederationStatus />
+        </div>
       </header>
 
       <div

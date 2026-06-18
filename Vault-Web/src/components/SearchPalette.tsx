@@ -30,8 +30,15 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
       }
     };
 
+    const handleCustomOpen = () => setIsOpen(true);
+
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("open-search", handleCustomOpen);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("open-search", handleCustomOpen);
+    };
   }, []);
 
   useEffect(() => {
