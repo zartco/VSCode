@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -10,11 +10,12 @@ interface MarkdownReaderProps {
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
 
-const staticRemarkPlugins = [remarkGfm, remarkMath];
-const staticRehypePlugins = [rehypeKatex];
-
-// Helper to extract Obsidian callouts from blockquotes
-const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
+export default function MarkdownReader({
+  file,
+  renderBlockquote,
+}: MarkdownReaderProps) {
+  // Helper to extract Obsidian callouts from blockquotes
+  const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
     const { children } = props;
 
     let isCallout = false;
@@ -77,18 +78,7 @@ const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
     }
 
     return <blockquote>{children}</blockquote>;
-};
-
-export default function MarkdownReader({
-  file,
-  renderBlockquote,
-}: MarkdownReaderProps) {
-  const components = useMemo(
-    () => ({
-      blockquote: renderBlockquote || defaultRenderBlockquote,
-    }),
-    [renderBlockquote],
-  );
+  };
 
   return (
     <div
@@ -139,9 +129,11 @@ export default function MarkdownReader({
           style={{ color: "inherit" }}
         >
           <ReactMarkdown
-            remarkPlugins={staticRemarkPlugins as any}
-            rehypePlugins={staticRehypePlugins as any}
-            components={components}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              blockquote: renderBlockquote || defaultRenderBlockquote,
+            }}
           >
             {file.content}
           </ReactMarkdown>
