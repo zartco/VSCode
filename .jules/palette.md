@@ -1,3 +1,4 @@
-## 2024-10-24 - Search Palette Keyboard Accessibility
-**Learning:** Custom command palettes built outside native dialog structures often miss out-of-the-box keyboard focus indicators and ARIA labels. The Vault-Web `SearchPalette` lacked clear focus rings for keyboard navigators traversing search results and an accessible name for the search input.
-**Action:** Ensure custom modal inputs have explicit `aria-label`s when not visually labeled, and add explicit `focus-visible` utility classes (e.g. `focus-visible:ring-2 focus-visible:ring-[#10b981]`) to interactive results to support keyboard users.
+
+## 2025-02-28 - Visible Keyboard Shortcuts
+**Learning:** Global keyboard shortcuts (like Ctrl+K) are easily missed by users and screen readers if they are not explicitly paired with a visible UI element.
+**Action:** Always provide a persistently visible, accessible UI button that both advertises the shortcut key and triggers the corresponding action to ensure discoverability and accessibility.
