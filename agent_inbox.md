@@ -1,3 +1,12 @@
+# Daily Stewardship Run - 2026-06-21
+
+## What Happened
+- Daily digest posted: no commits in the last 24 hours (`#95`).
+- Security scan posted a new finding for tracked Google Calendar exports exposing private schedule data (`#96`).
+
+## Re-entry Note
+- If cleaning privacy leaks, start with `Precalculus/*.ics`, then update `.gitignore` and decide whether history cleanup is needed.
+
 # Daily Digest - Workspace Evolution (2026-06-13)
 
 ## CS Concepts Touched
