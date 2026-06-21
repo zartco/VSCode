@@ -2,7 +2,7 @@
 title: Emerging Multi-Agent Frameworks and Python Automation for WGU BSCS
 date: 2026-06-14
 tags: [learning, discovery, automated-research, wgu-portfolio]
-status: completed
+status: review-pending
 ---
 
 ## Overview

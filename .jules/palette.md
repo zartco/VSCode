@@ -1,5 +1,3 @@
-# Palette's UX Learning Journal
-
-## 2024-06-22 - Search Palette Discoverability
-**Learning:** The SearchPalette component implemented a global shortcut (Ctrl+K) but lacked a visible UI trigger in the main application layout (`VaultApp.tsx`). This violates the accessibility and UX principle of discoverability, as users wouldn't know the feature existed without guessing the shortcut.
-**Action:** Added a prominent, styled search button to the top taskbar that explicitly shows the `Ctrl+K` shortcut using a `<kbd>` element. Pair keyboard shortcuts with visible UI buttons.
+## 2024-10-24 - Search Palette Keyboard Accessibility
+**Learning:** Custom command palettes built outside native dialog structures often miss out-of-the-box keyboard focus indicators and ARIA labels. The Vault-Web `SearchPalette` lacked clear focus rings for keyboard navigators traversing search results and an accessible name for the search input.
+**Action:** Ensure custom modal inputs have explicit `aria-label`s when not visually labeled, and add explicit `focus-visible` utility classes (e.g. `focus-visible:ring-2 focus-visible:ring-[#10b981]`) to interactive results to support keyboard users.
