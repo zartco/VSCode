@@ -1,5 +1,10 @@
 # Daily Digest - Workspace Evolution (2026-06-13)
 
+## Git Steward Note (2026-06-22)
+- Daily digest posted: https://github.com/zartco/VSCode/issues/106
+- Security finding posted: https://github.com/zartco/VSCode/issues/107
+- Re-entry point: `Federation/core/federation.db` is tracked and contains historical agent telemetry; decide whether to untrack it, purge history, and replace it with ignored local state or sanitized fixtures.
+
 ## CS Concepts Touched
 - Multi-agent topologies (Leader-Follower orchestrators).
 - State encapsulation and context isolation via `chokidar` telemetry.
