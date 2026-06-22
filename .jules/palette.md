@@ -1,3 +1,5 @@
-## 2026-06-23 - Accessible Keyboard Shortcuts
-**Learning:** Always pair global keyboard shortcuts (like Ctrl+K) with a persistently visible, accessible UI element that both triggers the action and advertises the shortcut key to ensure discoverability.
-**Action:** Lift shortcut listener state up when necessary to control an external UI trigger element, ensuring all users can discover and use the feature.
+# Palette's UX Learning Journal
+
+## 2024-06-22 - Search Palette Discoverability
+**Learning:** The SearchPalette component implemented a global shortcut (Ctrl+K) but lacked a visible UI trigger in the main application layout (`VaultApp.tsx`). This violates the accessibility and UX principle of discoverability, as users wouldn't know the feature existed without guessing the shortcut.
+**Action:** Added a prominent, styled search button to the top taskbar that explicitly shows the `Ctrl+K` shortcut using a `<kbd>` element. Pair keyboard shortcuts with visible UI buttons.

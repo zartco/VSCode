@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -24,6 +24,22 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
   const [activeView, setActiveView] = useState<
     "federation" | "folder" | "file" | "analytics" | "timelapse" | "3dnexus"
   >("3dnexus");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "k") {
+        e.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (e.key === "Escape") {
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div
@@ -39,6 +55,8 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
     >
       <SearchPalette
         files={files}
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
         onSelect={(file) => {
           setActiveFolder(file.folder);
           setActiveFile(file);
@@ -69,7 +87,19 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           <Terminal size={14} />
           <span>root@strigiformes-os:~</span>
         </div>
-        <FederationStatus />
+        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+          <button
+            onClick={() => setIsSearchOpen(true)}
+            className="flex items-center gap-2 px-2 py-1 bg-white/10 border border-[#333] rounded text-[#aaa] hover:text-white transition-colors cursor-pointer"
+            aria-label="Search files"
+            title="Search files (Ctrl+K)"
+          >
+            <Search size={14} />
+            <span>Search...</span>
+            <kbd className="px-1 bg-black/50 rounded text-[10px]">Ctrl K</kbd>
+          </button>
+          <FederationStatus />
+        </div>
       </header>
 
       <div
