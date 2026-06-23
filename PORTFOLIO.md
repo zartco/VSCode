@@ -40,3 +40,11 @@ A React/Next.js dashboard acting as a unified command center for multi-agent ope
 ---
 
 > *This showcase is maintained under perpetual AI stewardship.*
+
+## 📋 Automated Discovery & System Logs
+
+### Learning
+- **Emerging Multi-Agent Frameworks and Python Automation for WGU BSCS** (2026-06-14)
+  - ## Overview
+
+As the landscape of multi-agent AI continues to evolve in 2026, the focus has shifted from generic models to highly specialized orchestration frameworks. Two prominent leaders emerging in...
