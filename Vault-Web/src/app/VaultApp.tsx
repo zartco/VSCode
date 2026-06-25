@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
+import React, { useState } from "react";
+import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -24,22 +24,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
   const [activeView, setActiveView] = useState<
     "federation" | "folder" | "file" | "analytics" | "timelapse" | "3dnexus"
   >("3dnexus");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "k") {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
-      if (e.key === "Escape") {
-        setIsSearchOpen(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   return (
     <div
@@ -55,8 +39,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
     >
       <SearchPalette
         files={files}
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
         onSelect={(file) => {
           setActiveFolder(file.folder);
           setActiveFile(file);
@@ -82,41 +64,10 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
       >
         <div
           className="taskbar-brand"
-          style={{ display: "flex", alignItems: "center", gap: "16px" }}
+          style={{ display: "flex", alignItems: "center", gap: "8px" }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Terminal size={14} />
-            <span>root@strigiformes-os:~</span>
-          </div>
-          <button
-            onClick={() => setIsSearchOpen(true)}
-            aria-label="Search files (Ctrl+K)"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "4px 8px",
-              background: "#1e1e1e",
-              border: "1px solid #333",
-              borderRadius: "4px",
-              color: "#9ca3af",
-              cursor: "pointer",
-            }}
-            className="hover:bg-[#2a2a2a] focus-visible:ring-2 focus-visible:ring-[#10b981] outline-none transition-colors"
-          >
-            <Search size={14} />
-            <span>Search...</span>
-            <kbd
-              style={{
-                fontSize: "0.7rem",
-                border: "1px solid #4b5563",
-                borderRadius: "2px",
-                padding: "0 4px",
-              }}
-            >
-              Ctrl+K
-            </kbd>
-          </button>
+          <Terminal size={14} />
+          <span>root@strigiformes-os:~</span>
         </div>
         <FederationStatus />
       </header>
