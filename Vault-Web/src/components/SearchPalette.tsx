@@ -30,14 +30,8 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
       }
     };
 
-    const handleCustomOpen = () => setIsOpen(true);
-
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("open-search-palette", handleCustomOpen as EventListener);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("open-search-palette", handleCustomOpen as EventListener);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -86,7 +80,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
             ref={inputRef}
             type="text"
             className="w-full py-4 bg-transparent text-gray-200 placeholder-gray-500 outline-none"
-            placeholder="Search files... (Esc to close)"
+            placeholder="Search files... (Ctrl+K to open)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />

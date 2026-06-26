@@ -1,129 +1,120 @@
 import os
 import re
 import yaml
-
-VAULT_DIRS = ['.']
+from pathlib import Path
 
 def redact_content(content):
-    # Scrub local paths
-    content = re.sub(r'[a-zA-Z]:\\[^\s]+', '[REDACTED_PATH]', content)
-    # Scrub emails
-    content = re.sub(r'[\w\.-]+@[\w\.-]+\.\w+', '[REDACTED_EMAIL]', content)
+    # Scrub local paths/emails ([REDACTED_PATH], [REDACTED_EMAIL])
+    # Windows paths like C:\Users\Zartc\...
+    content = re.sub(r'[a-zA-Z]:\\[\w\\\-\.]+', '[REDACTED_PATH]', content)
+    # Unix-like paths (heuristics)
+    content = re.sub(r'(?<= )/[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-/]+', '[REDACTED_PATH]', content)
+    # Emails
+    content = re.sub(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', '[REDACTED_EMAIL]', content)
     return content
 
-def get_portfolio_files():
-    files_to_process = []
-    for dir_path in VAULT_DIRS:
-        if not os.path.exists(dir_path):
-            continue
-        for root, _, files in os.walk(dir_path):
-            if 'node_modules' in root or '.git' in root or '.jules' in root:
-                continue
-            for file in files:
-                if file.endswith('.md'):
-                    files_to_process.append(os.path.join(root, file))
+def extract_frontmatter(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except UnicodeDecodeError:
+        return None, None
 
-    portfolio_artifacts = []
-
-    for filepath in files_to_process:
+    match = re.match(r'^---\n(.*?)\n---\n(.*)', content, re.DOTALL)
+    if match:
         try:
-            with open(filepath, 'r', encoding='utf-8') as f:
-                content = f.read()
-
-            # Simple frontmatter parsing
-            if not content.startswith('---'):
-                continue
-
-            parts = content.split('---', 2)
-            if len(parts) < 3:
-                continue
-
-            frontmatter_str = parts[1]
-            body = parts[2].strip()
-
-            try:
-                metadata = yaml.safe_load(frontmatter_str)
-            except yaml.YAMLError:
-                continue
-
-            if not isinstance(metadata, dict):
-                continue
-
-            if metadata.get('status') != 'completed':
-                continue
-
-            tags = metadata.get('tags', [])
-            if isinstance(tags, str):
-                tags = [t.strip() for t in tags.split(',')]
-            elif not isinstance(tags, list):
-                tags = []
-
-            is_portfolio = any('portfolio' in str(t).lower() for t in tags)
-            if not is_portfolio:
-                continue
-
-            portfolio_artifacts.append({
-                'title': metadata.get('title', os.path.basename(filepath)),
-                'date': metadata.get('date', ''),
-                'tags': tags,
-                'body': redact_content(body),
-                'path': filepath
-            })
-
-        except Exception as e:
-            print(f"Error processing {filepath}: {e}")
-
-    return portfolio_artifacts
+            frontmatter = yaml.safe_load(match.group(1))
+            body = match.group(2)
+            return frontmatter, body
+        except yaml.YAMLError:
+            pass
+    return None, content
 
 def build_portfolio():
-    artifacts = get_portfolio_files()
-
-    groups = {
-        'Academic Competency': [],
-        'System Automation': [],
-        'Multi-Agent Workflows': [],
-        'Other Discovery': []
-    }
-
-    for item in artifacts:
-        tags = [str(t).lower() for t in item['tags']]
-        if 'academic' in tags or 'wgu-portfolio' in tags or 'learning' in tags:
-            groups['Academic Competency'].append(item)
-        elif 'system' in tags or 'automation' in tags:
-            groups['System Automation'].append(item)
-        elif 'agent' in tags or 'multi-agent' in tags or 'federation' in tags:
-            groups['Multi-Agent Workflows'].append(item)
-        else:
-            groups['Other Discovery'].append(item)
-
-    dynamic_section = "## 📋 Automated Discovery & System Logs\n\n"
-
-    for group_name, items in groups.items():
-        if not items:
+    completed_artifacts = []
+    for root, dirs, files in os.walk('.'):
+        if '.git' in root or 'node_modules' in root:
             continue
-        dynamic_section += f"### {group_name}\n\n"
-        for item in items:
-            dynamic_section += f"#### {item['title']} ({item['date']})\n"
-            dynamic_section += f"{item['body']}\n\n"
+        for file in files:
+            if file.endswith('.md'):
+                file_path = os.path.join(root, file)
+                if 'PORTFOLIO.md' in file_path or 'README.md' in file_path:
+                    continue
 
-    if os.path.exists('PORTFOLIO.md'):
-        with open('PORTFOLIO.md', 'r', encoding='utf-8') as f:
-            portfolio_content = f.read()
+                fm, body = extract_frontmatter(file_path)
+                if fm:
+                    tags = fm.get('tags', [])
+                    if not isinstance(tags, list):
+                        tags = [str(tags)]
+
+                    has_portfolio = any('portfolio' in tag.lower() for tag in tags)
+
+                    if has_portfolio and fm.get('status') == 'completed':
+                        completed_artifacts.append((fm, body, file_path))
+
+    # Group by competency
+    groups = {}
+    for fm, body, file_path in completed_artifacts:
+        tags = fm.get('tags', [])
+        if not isinstance(tags, list):
+            tags = [str(tags)]
+        tags = [t.lower() for t in tags]
+
+        group_name = "General Documentation"
+        if any(t in ['academic', 'learning', 'wgu-portfolio'] for t in tags):
+            group_name = "Academic Competency"
+        if any(t in ['automation', 'system-automation', 'orchestration'] for t in tags):
+            group_name = "System Automation"
+        if any(t in ['multi-agent', 'discovery', 'research'] for t in tags):
+            group_name = "Automated Discovery"
+
+        groups.setdefault(group_name, []).append((fm, body, file_path))
+
+    dynamic_content = "## 📋 Automated Discovery & System Logs\n\n"
+    if not groups:
+        dynamic_content += "*No newly completed automated discovery logs available at this time.*\n\n"
     else:
-        portfolio_content = "# Zartco's Academic & Engineering Showcase\n\nThis portfolio documents a four-year computer science progression, dynamically aggregated from active workspace artifacts.\n"
+        for group_name, artifacts in groups.items():
+            dynamic_content += f"### {group_name}\n\n"
+            for fm, body, file_path in artifacts:
+                title = fm.get('title', 'Untitled Document')
+                date = fm.get('date', 'Unknown Date')
 
-    marker = "## 📋 Automated Discovery & System Logs"
+                safe_body = redact_content(body)
 
-    if marker in portfolio_content:
-        parts = portfolio_content.split(marker)
-        new_content = parts[0] + dynamic_section
+                # Extract first meaningful paragraph
+                lines = safe_body.split('\n')
+                snippet = ""
+                for line in lines:
+                    line = line.strip()
+                    if line and not line.startswith('#') and not line.startswith('-') and not line.startswith('>'):
+                        snippet = line
+                        break
+                if len(snippet) > 200:
+                    snippet = snippet[:197] + "..."
+
+                dynamic_content += f"**{title}** ({date})\n"
+                dynamic_content += f"> {snippet}\n\n"
+
+    with open('PORTFOLIO.md', 'r', encoding='utf-8') as f:
+        portfolio_content = f.read()
+
+    if '## 📋 Automated Discovery & System Logs' in portfolio_content:
+        portfolio_content = re.sub(
+            r'## 📋 Automated Discovery & System Logs.*?(?=\n> \*This showcase is maintained)',
+            dynamic_content,
+            portfolio_content,
+            flags=re.DOTALL
+        )
     else:
-        new_content = portfolio_content + "\n\n" + dynamic_section
+        insertion_point = portfolio_content.find('> *This showcase is maintained')
+        if insertion_point != -1:
+            portfolio_content = portfolio_content[:insertion_point] + dynamic_content + '\n' + portfolio_content[insertion_point:]
+        else:
+            portfolio_content += '\n' + dynamic_content
 
     with open('PORTFOLIO.md', 'w', encoding='utf-8') as f:
-        f.write(new_content)
-
-    print("Portfolio built successfully.")
+        f.write(portfolio_content)
 
 if __name__ == "__main__":
     build_portfolio()

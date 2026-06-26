@@ -5,16 +5,17 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import { VaultFile } from "@/lib/vault";
 
-const remarkPluginsStatic = [remarkGfm, remarkMath];
-const rehypePluginsStatic = [rehypeKatex];
-
 interface MarkdownReaderProps {
   file: VaultFile;
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
 
-// Helper to extract Obsidian callouts from blockquotes
-const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
+export default function MarkdownReader({
+  file,
+  renderBlockquote,
+}: MarkdownReaderProps) {
+  // Helper to extract Obsidian callouts from blockquotes
+  const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
     const { children } = props;
 
     let isCallout = false;
@@ -79,17 +80,6 @@ const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
     return <blockquote>{children}</blockquote>;
   };
 
-export default function MarkdownReader({
-  file,
-  renderBlockquote,
-}: MarkdownReaderProps) {
-  const memoizedComponents = React.useMemo(
-    () => ({
-      blockquote: renderBlockquote || defaultRenderBlockquote,
-    }),
-    [renderBlockquote]
-  );
-
   return (
     <div
       className="terminal-reader"
@@ -138,11 +128,12 @@ export default function MarkdownReader({
           className="markdown-container markdown-body"
           style={{ color: "inherit" }}
         >
-          {/* ⚡ Bolt: Using static plugin arrays and memoized components to prevent AST rebuilds on every render */}
           <ReactMarkdown
-            remarkPlugins={remarkPluginsStatic}
-            rehypePlugins={rehypePluginsStatic}
-            components={memoizedComponents}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              blockquote: renderBlockquote || defaultRenderBlockquote,
+            }}
           >
             {file.content}
           </ReactMarkdown>
