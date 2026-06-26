@@ -39,8 +39,4 @@ A React/Next.js dashboard acting as a unified command center for multi-agent ope
 
 ---
 
-## 📋 Automated Discovery & System Logs
-
----
-
 > *This showcase is maintained under perpetual AI stewardship.*
