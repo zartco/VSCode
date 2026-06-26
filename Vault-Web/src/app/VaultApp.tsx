@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
+import React, { useState } from "react";
+import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -24,19 +24,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
   const [activeView, setActiveView] = useState<
     "federation" | "folder" | "file" | "analytics" | "timelapse" | "3dnexus"
   >("3dnexus");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "k") {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   return (
     <div
@@ -52,8 +39,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
     >
       <SearchPalette
         files={files}
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
         onSelect={(file) => {
           setActiveFolder(file.folder);
           setActiveFile(file);
@@ -232,37 +217,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
                 <History size={18} />
                 <span>Vault Timelapse</span>
               </div>
-
-              <button
-                onClick={() => setIsSearchOpen(true)}
-                aria-label="Open Global Search"
-                style={{
-                  marginBottom: "16px",
-                  color: "var(--text-primary)",
-                  borderBottom: "1px solid #333",
-                  paddingBottom: "12px",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  padding: "8px 12px",
-                  background: "transparent",
-                  border: "none",
-                  width: "100%",
-                  textAlign: "left",
-                  borderBottomWidth: "1px",
-                  borderBottomStyle: "solid",
-                  borderBottomColor: "#333",
-                }}
-                className="folder-item hover:bg-[#2a2a2a] rounded-md transition-colors"
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <Search size={18} />
-                  <span>Search</span>
-                </div>
-                <span style={{ fontSize: "0.75rem", color: "#666", fontFamily: "monospace" }}>Ctrl+K</span>
-              </button>
 
             </div>
 
