@@ -1,93 +1,101 @@
 import os
-import yaml
 import re
+import yaml
+from pathlib import Path
 
 def redact_content(text):
-    text = re.sub(r'C:\\Users\\[^\\]+\\', '[REDACTED_PATH]\\\\', text)
-    text = re.sub(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', '[REDACTED_EMAIL]', text)
+    # Temporarily preserve URLs
+    urls = []
+    def replace_url(match):
+        urls.append(match.group(0))
+        return f"__URL_PLACEHOLDER_{len(urls)-1}__"
+    text = re.sub(r'https?://[^\s<>"]+|www\.[^\s<>"]+', replace_url, text)
+
+    # Redact local paths
+    text = re.sub(r'(?:[a-zA-Z]:\\|/)[^\s<>"]+', '[REDACTED_PATH]', text)
+
+    # Redact emails
+    text = re.sub(r'[\w\.-]+@[\w\.-]+\.\w+', '[REDACTED_EMAIL]', text)
+
+    # Restore URLs
+    for i, url in enumerate(urls):
+        text = text.replace(f"__URL_PLACEHOLDER_{i}__", url)
+
     return text
 
-def find_markdown_files(root_dir):
-    md_files = []
-    for dirpath, _, filenames in os.walk(root_dir):
-        if 'node_modules' in dirpath or '.git' in dirpath:
-            continue
-        for f in filenames:
-            if f.endswith('.md'):
-                md_files.append(os.path.join(dirpath, f))
-    return md_files
-
-def parse_frontmatter(filepath):
-    with open(filepath, 'r', encoding='utf-8') as f:
+def parse_frontmatter(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
 
     match = re.match(r'^---\n(.*?)\n---\n(.*)', content, re.DOTALL)
-    if match:
-        try:
-            frontmatter = yaml.safe_load(match.group(1))
-            body = match.group(2)
-            return frontmatter, body
-        except yaml.YAMLError:
-            return None, None
-    return None, None
+    if not match:
+        return None, None
 
-def main():
-    root_dir = '.'
-    md_files = find_markdown_files(root_dir)
+    try:
+        frontmatter = yaml.safe_load(match.group(1))
+        return frontmatter, match.group(2)
+    except yaml.YAMLError:
+        return None, None
 
-    portfolio_items = []
-    for filepath in md_files:
-        frontmatter, body = parse_frontmatter(filepath)
-        if frontmatter:
-            status = frontmatter.get('status', '')
-            tags = frontmatter.get('tags', [])
-            if status == 'completed' and any('portfolio' in tag for tag in tags):
-                title = frontmatter.get('title', os.path.basename(filepath))
-                date = frontmatter.get('date', 'Unknown Date')
-                portfolio_items.append({
-                    'title': title,
-                    'date': date,
-                    'tags': tags,
-                    'filepath': filepath,
-                    'body': body
-                })
+def collect_artifacts():
+    artifacts = {}
+    for root, _, files in os.walk('.'):
+        if 'node_modules' in root or '.git' in root:
+            continue
+        for file in files:
+            if file.endswith('.md'):
+                file_path = os.path.join(root, file)
+                frontmatter, _ = parse_frontmatter(file_path)
 
-    grouped_items = {}
-    for item in portfolio_items:
-        # Just put them under a default category or group by first tag
-        category = 'General'
-        if item['tags']:
-            category = item['tags'][0].title().replace('-', ' ')
-        if category not in grouped_items:
-            grouped_items[category] = []
-        grouped_items[category].append(item)
+                if frontmatter and isinstance(frontmatter, dict):
+                    status = str(frontmatter.get('status', '')).lower()
+                    tags = frontmatter.get('tags', [])
 
-    portfolio_file = 'PORTFOLIO.md'
-    if os.path.exists(portfolio_file):
-        with open(portfolio_file, 'r', encoding='utf-8') as f:
-            content = f.read()
-    else:
-        content = "# Zartco's Academic & Engineering Showcase\n\n"
+                    if isinstance(tags, str):
+                        tags = [t.strip() for t in tags.split(',')]
+                    elif not isinstance(tags, list):
+                        tags = []
 
-    header = '## 📋 Automated Discovery & System Logs'
+                    is_portfolio = any('portfolio' in str(t).lower() for t in tags)
 
-    new_content = f"\n\n{header}\n\n"
-    for category, items in grouped_items.items():
-        new_content += f"### {category}\n\n"
+                    if is_portfolio and ('completed' in status or 'done' in status):
+                        competency = frontmatter.get('competency') or frontmatter.get('module') or 'Uncategorized'
+                        title = frontmatter.get('title', file)
+
+                        if competency not in artifacts:
+                            artifacts[competency] = []
+
+                        artifacts[competency].append({
+                            'title': title,
+                            'path': file_path,
+                            'frontmatter': frontmatter
+                        })
+    return artifacts
+
+def generate_portfolio_markdown(artifacts):
+    md = "## 📋 Automated Discovery & System Logs\n\n"
+    for competency, items in artifacts.items():
+        md += f"### {competency}\n"
         for item in items:
-            new_content += f"#### [{item['title']}]({item['filepath']}) - {item['date']}\n"
-            # A short preview
-            preview = item['body'][:200].strip() + '...'
-            preview = redact_content(preview)
-            new_content += f"{preview}\n\n"
+            md += f"- **{item['title']}** (Source: `[REDACTED_PATH]`)\n"
+    return redact_content(md)
 
+def update_portfolio():
+    artifacts = collect_artifacts()
+    new_section = generate_portfolio_markdown(artifacts)
+
+    portfolio_path = 'PORTFOLIO.md'
+    with open(portfolio_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    header = "## 📋 Automated Discovery & System Logs"
     if header in content:
-        content = content.split(header)[0] + new_content
+        content = re.sub(rf"{header}.*", new_section, content, flags=re.DOTALL)
     else:
-        content += new_content
+        content += f"\n\n{new_section}"
 
-    with open(portfolio_file, 'w', encoding='utf-8') as f:
+    with open(portfolio_path, 'w', encoding='utf-8') as f:
         f.write(content)
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    update_portfolio()
