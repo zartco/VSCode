@@ -1,101 +1,122 @@
 import os
 import re
 import yaml
-from pathlib import Path
+from collections import defaultdict
 
-def redact_content(text):
-    # Temporarily preserve URLs
+def anonymize(text):
     urls = []
-    def replace_url(match):
+    def url_repl(match):
         urls.append(match.group(0))
         return f"__URL_PLACEHOLDER_{len(urls)-1}__"
-    text = re.sub(r'https?://[^\s<>"]+|www\.[^\s<>"]+', replace_url, text)
 
-    # Redact local paths
-    text = re.sub(r'(?:[a-zA-Z]:\\|/)[^\s<>"]+', '[REDACTED_PATH]', text)
+    text = re.sub(r'https?://[^\s<>"]+', url_repl, text)
+    text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[REDACTED_EMAIL]', text)
+    text = re.sub(r'[a-zA-Z]:\\[\S]*', '[REDACTED_PATH]', text)
+    text = re.sub(r'(?<!\S)(?:/home|/Users|~)/[\S]*', '[REDACTED_PATH]', text)
 
-    # Redact emails
-    text = re.sub(r'[\w\.-]+@[\w\.-]+\.\w+', '[REDACTED_EMAIL]', text)
-
-    # Restore URLs
     for i, url in enumerate(urls):
         text = text.replace(f"__URL_PLACEHOLDER_{i}__", url)
-
     return text
 
-def parse_frontmatter(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+def parse_frontmatter(content):
+    if content.startswith('---'):
+        parts = content.split('---', 2)
+        if len(parts) >= 3:
+            try:
+                fm = yaml.safe_load(parts[1])
+                body = parts[2].strip()
+                return fm, body
+            except yaml.YAMLError:
+                pass
+    return None, content
 
-    match = re.match(r'^---\n(.*?)\n---\n(.*)', content, re.DOTALL)
-    if not match:
-        return None, None
-
-    try:
-        frontmatter = yaml.safe_load(match.group(1))
-        return frontmatter, match.group(2)
-    except yaml.YAMLError:
-        return None, None
-
-def collect_artifacts():
-    artifacts = {}
+def find_completed_portfolio_files():
+    files_found = []
     for root, _, files in os.walk('.'):
-        if 'node_modules' in root or '.git' in root:
+        if '.git' in root or 'node_modules' in root or '.jules' in root:
             continue
         for file in files:
             if file.endswith('.md'):
-                file_path = os.path.join(root, file)
-                frontmatter, _ = parse_frontmatter(file_path)
+                path = os.path.join(root, file)
+                try:
+                    with open(path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                except UnicodeDecodeError:
+                    continue
 
-                if frontmatter and isinstance(frontmatter, dict):
-                    status = str(frontmatter.get('status', '')).lower()
-                    tags = frontmatter.get('tags', [])
-
+                fm, body = parse_frontmatter(content)
+                if fm and isinstance(fm, dict):
+                    tags = fm.get('tags', [])
                     if isinstance(tags, str):
                         tags = [t.strip() for t in tags.split(',')]
-                    elif not isinstance(tags, list):
-                        tags = []
 
-                    is_portfolio = any('portfolio' in str(t).lower() for t in tags)
+                    status = fm.get('status', '').lower()
 
-                    if is_portfolio and ('completed' in status or 'done' in status):
-                        competency = frontmatter.get('competency') or frontmatter.get('module') or 'Uncategorized'
-                        title = frontmatter.get('title', file)
+                    if 'portfolio' in tags or 'wgu-portfolio' in tags:
+                        if status == 'completed':
+                            files_found.append((path, fm, body))
+    return files_found
 
-                        if competency not in artifacts:
-                            artifacts[competency] = []
+def determine_competency(tags):
+    tags_lower = [t.lower() for t in tags]
+    if 'system automation' in tags_lower or 'automation' in tags_lower:
+        return 'System Automation'
+    if 'multi-agent workflows' in tags_lower or 'multi-agent' in tags_lower or 'agent' in tags_lower:
+        return 'Multi-Agent Workflows'
+    if 'academic competency' in tags_lower or 'learning' in tags_lower or 'academic' in tags_lower:
+        return 'Academic Competency'
+    return 'Other'
 
-                        artifacts[competency].append({
-                            'title': title,
-                            'path': file_path,
-                            'frontmatter': frontmatter
-                        })
-    return artifacts
+def rebuild_portfolio():
+    files = find_completed_portfolio_files()
+    if not files:
+        print("No completed portfolio files found.")
+        return
 
-def generate_portfolio_markdown(artifacts):
-    md = "## 📋 Automated Discovery & System Logs\n\n"
-    for competency, items in artifacts.items():
-        md += f"### {competency}\n"
-        for item in items:
-            md += f"- **{item['title']}** (Source: `[REDACTED_PATH]`)\n"
-    return redact_content(md)
+    # Check if PORTFOLIO.md exists
+    portfolio_content = ""
+    if os.path.exists('PORTFOLIO.md'):
+        with open('PORTFOLIO.md', 'r', encoding='utf-8') as f:
+            portfolio_content = f.read()
 
-def update_portfolio():
-    artifacts = collect_artifacts()
-    new_section = generate_portfolio_markdown(artifacts)
+    # We will look for a dynamic section header to append to
+    dynamic_header = "## 📋 Automated Discovery & System Logs"
 
-    portfolio_path = 'PORTFOLIO.md'
-    with open(portfolio_path, 'r', encoding='utf-8') as f:
-        content = f.read()
+    if dynamic_header not in portfolio_content:
+        portfolio_content += f"\n\n{dynamic_header}\n\n"
 
-    header = "## 📋 Automated Discovery & System Logs"
-    if header in content:
-        content = re.sub(rf"{header}.*", new_section, content, flags=re.DOTALL)
-    else:
-        content += f"\n\n{new_section}"
+    parts = portfolio_content.split(dynamic_header)
+    base_content = parts[0].strip()
 
-    with open(portfolio_path, 'w', encoding='utf-8') as f:
-        f.write(content)
+    new_content = base_content + f"\n\n{dynamic_header}\n\n"
 
-if __name__ == "__main__":
-    update_portfolio()
+    # Group by competency
+    grouped_files = defaultdict(list)
+    for path, fm, body in files:
+        tags = fm.get('tags', [])
+        if isinstance(tags, str):
+            tags = [t.strip() for t in tags.split(',')]
+        competency = determine_competency(tags)
+        grouped_files[competency].append((path, fm, body))
+
+    for competency, comp_files in grouped_files.items():
+        new_content += f"### {competency}\n\n"
+        for path, fm, body in comp_files:
+            title = fm.get('title', os.path.basename(path))
+            date = fm.get('date', '')
+
+            anonymized_body = anonymize(body)
+
+            new_content += f"#### {title}\n"
+            if date:
+                new_content += f"**Date:** {date}\n"
+            new_content += "\n" + anonymized_body + "\n\n"
+        new_content += "---\n\n"
+
+    with open('PORTFOLIO.md', 'w', encoding='utf-8') as f:
+        f.write(new_content)
+
+    print("Rebuilt PORTFOLIO.md")
+
+if __name__ == '__main__':
+    rebuild_portfolio()
