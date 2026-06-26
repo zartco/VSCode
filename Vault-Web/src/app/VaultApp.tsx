@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
+import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -104,18 +104,42 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
             className="sidebar-nav"
             style={{ padding: "16px", overflowY: "auto", flex: 1 }}
           >
-            <h1 
-              className="sidebar-title"
-              style={{ cursor: "pointer" }}
-              onClick={() => {
-                setActiveFolder(null);
-                setActiveFile(null);
-                setActiveView("3dnexus");
-              }}
-              title="Return to 3D Nexus"
-            >
-              Vault
-            </h1>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+              <h1
+                className="sidebar-title"
+                style={{ cursor: "pointer", margin: 0 }}
+                onClick={() => {
+                  setActiveFolder(null);
+                  setActiveFile(null);
+                  setActiveView("3dnexus");
+                }}
+                title="Return to 3D Nexus"
+              >
+                Vault
+              </h1>
+              <button
+                aria-label="Search files (Ctrl+K)"
+                title="Search files (Ctrl+K)"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-search-palette'))}
+                className="hover:bg-[#10b981] hover:text-black focus-visible:ring-2 focus-visible:ring-[#10b981] transition-colors"
+                style={{
+                  background: "transparent",
+                  border: "1px solid #333",
+                  color: "#10b981",
+                  borderRadius: "4px",
+                  padding: "4px 8px",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  fontSize: "0.75rem",
+                  fontFamily: "monospace",
+                  outline: "none"
+                }}
+              >
+                <Search size={14} style={{ marginRight: "4px" }} />
+                Ctrl+K
+              </button>
+            </div>
 
             <div className="sidebar-nav">
               <div
