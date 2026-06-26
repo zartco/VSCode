@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
+import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -62,31 +62,12 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           color: "#10b981",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <div
-            className="taskbar-brand"
-            style={{ display: "flex", alignItems: "center", gap: "8px" }}
-          >
-            <Terminal size={14} />
-            <span>root@strigiformes-os:~</span>
-          </div>
-          <button
-            aria-label="Open Search Palette (Ctrl+K)"
-            onClick={() => window.dispatchEvent(new CustomEvent('open-search'))}
-            className="flex items-center gap-2 px-2 py-1 hover:bg-[#333] transition-colors rounded cursor-pointer text-[#a0a0a0] border-none bg-transparent"
-          >
-            <Search size={14} />
-            <span>Search</span>
-            <kbd style={{
-              background: "#222",
-              padding: "2px 6px",
-              borderRadius: "4px",
-              fontSize: "0.7rem",
-              color: "#888",
-              border: "1px solid #444",
-              marginLeft: "4px"
-            }}>Ctrl+K</kbd>
-          </button>
+        <div
+          className="taskbar-brand"
+          style={{ display: "flex", alignItems: "center", gap: "8px" }}
+        >
+          <Terminal size={14} />
+          <span>root@strigiformes-os:~</span>
         </div>
         <FederationStatus />
       </header>
