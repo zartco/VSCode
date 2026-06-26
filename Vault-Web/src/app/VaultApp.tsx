@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
+import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -106,7 +106,7 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
           >
             <h1 
               className="sidebar-title"
-              style={{ cursor: "pointer" }}
+              style={{ cursor: "pointer", marginBottom: "16px" }}
               onClick={() => {
                 setActiveFolder(null);
                 setActiveFile(null);
@@ -116,6 +116,49 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
             >
               Vault
             </h1>
+
+            <div
+              role="button"
+              tabIndex={0}
+              aria-label="Open search palette"
+              onClick={() => window.dispatchEvent(new CustomEvent("open-search-palette"))}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent("open-search-palette"));
+                }
+              }}
+              className="search-button hover:bg-[#1a1a1a] focus-visible:outline-2 focus-visible:outline-[#10b981]"
+              style={{
+                marginBottom: "16px",
+                padding: "8px 12px",
+                background: "#111",
+                border: "1px solid #333",
+                borderRadius: "6px",
+                color: "#888",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                fontSize: "0.85rem",
+                transition: "background 0.2s, border-color 0.2s",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Search size={14} />
+                <span>Search...</span>
+              </div>
+              <div style={{
+                background: "#222",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                fontSize: "0.7rem",
+                color: "#666",
+                fontFamily: "sans-serif"
+              }}>
+                Ctrl+K
+              </div>
+            </div>
 
             <div className="sidebar-nav">
               <div
