@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -10,75 +10,86 @@ interface MarkdownReaderProps {
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
 
+// ⚡ Bolt: Hoist static plugin arrays outside component to prevent ReactMarkdown from
+// unnecessarily re-parsing and re-building the AST on every component render.
+const REMARK_PLUGINS = [remarkGfm, remarkMath];
+const REHYPE_PLUGINS = [rehypeKatex];
+
+// Helper to extract Obsidian callouts from blockquotes
+const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
+  const { children } = props;
+
+  let isCallout = false;
+  let calloutType = "note";
+  let calloutTitle = "";
+
+  const childrenArray = React.Children.toArray(children);
+
+  const processChildren = (nodes: React.ReactNode[]): React.ReactNode[] => {
+    let matched = false;
+    return nodes.map((node) => {
+      if (!React.isValidElement(node)) return node;
+
+      if (node.type === "p" && !matched) {
+        const pProps = node.props as { children?: React.ReactNode };
+        const pChildren = React.Children.toArray(pProps.children);
+        const firstChild = pChildren[0];
+
+        if (typeof firstChild === "string") {
+          const match = firstChild.match(
+            /^\[!(note|warning|error|danger|success|example|info)\](.*)/i,
+          );
+          if (match) {
+            matched = true;
+            isCallout = true;
+            calloutType = match[1].toLowerCase();
+            calloutTitle =
+              match[2].trim() ||
+              calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
+
+            const newString = firstChild.replace(
+              /^\[!(note|warning|error|danger|success|example|info)\](.*)/i,
+              "",
+            );
+
+            if (!newString.trim() && pChildren.length === 1) {
+              return null;
+            }
+
+            return React.cloneElement(node, { key: node.key }, [
+              newString,
+              ...pChildren.slice(1),
+            ]);
+          }
+        }
+      }
+      return node;
+    });
+  };
+
+  const processedChildren = processChildren(childrenArray).filter(Boolean);
+
+  if (isCallout) {
+    return (
+      <div className="callout" data-type={calloutType}>
+        <div className="callout-title">{calloutTitle}</div>
+        <div className="callout-content">{processedChildren}</div>
+      </div>
+    );
+  }
+
+  return <blockquote>{children}</blockquote>;
+};
+
 export default function MarkdownReader({
   file,
   renderBlockquote,
 }: MarkdownReaderProps) {
-  // Helper to extract Obsidian callouts from blockquotes
-  const defaultRenderBlockquote = (props: { children?: React.ReactNode }) => {
-    const { children } = props;
-
-    let isCallout = false;
-    let calloutType = "note";
-    let calloutTitle = "";
-
-    const childrenArray = React.Children.toArray(children);
-
-    const processChildren = (nodes: React.ReactNode[]): React.ReactNode[] => {
-      let matched = false;
-      return nodes.map((node) => {
-        if (!React.isValidElement(node)) return node;
-
-        if (node.type === "p" && !matched) {
-          const pProps = node.props as { children?: React.ReactNode };
-          const pChildren = React.Children.toArray(pProps.children);
-          const firstChild = pChildren[0];
-
-          if (typeof firstChild === "string") {
-            const match = firstChild.match(
-              /^\[!(note|warning|error|danger|success|example|info)\](.*)/i,
-            );
-            if (match) {
-              matched = true;
-              isCallout = true;
-              calloutType = match[1].toLowerCase();
-              calloutTitle =
-                match[2].trim() ||
-                calloutType.charAt(0).toUpperCase() + calloutType.slice(1);
-
-              const newString = firstChild.replace(
-                /^\[!(note|warning|error|danger|success|example|info)\](.*)/i,
-                "",
-              );
-
-              if (!newString.trim() && pChildren.length === 1) {
-                return null;
-              }
-
-              return React.cloneElement(node, { key: node.key }, [
-                newString,
-                ...pChildren.slice(1),
-              ]);
-            }
-          }
-        }
-        return node;
-      });
-    };
-
-    const processedChildren = processChildren(childrenArray).filter(Boolean);
-
-    if (isCallout) {
-      return (
-        <div className="callout" data-type={calloutType}>
-          <div className="callout-title">{calloutTitle}</div>
-          <div className="callout-content">{processedChildren}</div>
-        </div>
-      );
-    }
-
-    return <blockquote>{children}</blockquote>;
-  };
+  // ⚡ Bolt: Memoize components object to maintain stable identity between renders,
+  // preventing unnecessary ReactMarkdown teardowns.
+  const components = useMemo(() => ({
+    blockquote: renderBlockquote || defaultRenderBlockquote,
+  }), [renderBlockquote]);
 
   return (
     <div
@@ -129,11 +140,9 @@ export default function MarkdownReader({
           style={{ color: "inherit" }}
         >
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-            components={{
-              blockquote: renderBlockquote || defaultRenderBlockquote,
-            }}
+            remarkPlugins={REMARK_PLUGINS}
+            rehypePlugins={REHYPE_PLUGINS}
+            components={components}
           >
             {file.content}
           </ReactMarkdown>
