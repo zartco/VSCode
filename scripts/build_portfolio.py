@@ -1,22 +1,22 @@
 import os
 import yaml
 import re
+from collections import defaultdict
 
-def sanitize_content(text):
-    # Temporarily replace URLs to avoid corruption
-    urls = re.findall(r'https?://[^\s<>"]+|www\.[^\s<>"]+', text)
-    placeholder_map = {f"__URL_{i}__": url for i, url in enumerate(urls)}
-    for placeholder, url in placeholder_map.items():
-        text = text.replace(url, placeholder)
+PORTFOLIO_FILE = 'PORTFOLIO.md'
+HEADER = '## 📋 Automated Discovery & System Logs'
 
-    # Redact local paths and emails
-    text = re.sub(r'[A-Z]:\\[^\s<>"]+', '[REDACTED_PATH]', text, flags=re.IGNORECASE)
-    text = re.sub(r'/[^\s<>"]+/[^\s<>"]+', '[REDACTED_PATH]', text) # simple unix path match
+def anonymize(text):
     text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[REDACTED_EMAIL]', text)
 
-    # Restore URLs
-    for placeholder, url in placeholder_map.items():
-        text = text.replace(placeholder, url)
+    urls = re.findall(r'https?://[^\s]+', text)
+    for i, url in enumerate(urls):
+        text = text.replace(url, f"__URL_PLACEHOLDER_{i}__")
+
+    text = re.sub(r'([A-Za-z]:\\[\w\\\-.]+)|(/[\w/\-.]+)', '[REDACTED_PATH]', text)
+
+    for i, url in enumerate(urls):
+        text = text.replace(f"__URL_PLACEHOLDER_{i}__", url)
 
     return text
 
@@ -24,77 +24,78 @@ def parse_frontmatter(content):
     match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
     if match:
         try:
-            return yaml.safe_load(match.group(1)), content[match.end():]
+            return yaml.safe_load(match.group(1))
         except yaml.YAMLError:
             pass
-    return None, content
+    return None
 
-def get_portfolio_artifacts():
-    artifacts = []
-    for root, _, files in os.walk('.'):
-        if 'node_modules' in root or '.subagents' in root:
+def build_portfolio():
+    portfolio_files = []
+    for root, dirs, files in os.walk('.'):
+        if 'node_modules' in root or '.git' in root:
             continue
         for file in files:
             if file.endswith('.md'):
-                path = os.path.join(root, file)
-                try:
-                    with open(path, 'r', encoding='utf-8') as f:
-                        content = f.read()
-                    frontmatter, body = parse_frontmatter(content)
-                    if frontmatter and isinstance(frontmatter, dict):
-                        tags = frontmatter.get('tags', [])
+                filepath = os.path.join(root, file)
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    fm = parse_frontmatter(content)
+                    if fm and isinstance(fm, dict):
+                        status = fm.get('status')
+                        tags = fm.get('tags', [])
                         if isinstance(tags, str):
-                            tags = [t.strip() for t in tags.split(',')]
+                            tags = [tags]
+                        if not tags:
+                            tags = []
+                        is_portfolio = any('portfolio' in t.lower() for t in tags)
+                        if status == 'completed' and is_portfolio:
+                            portfolio_files.append((filepath, fm, content))
 
-                        status = frontmatter.get('status', '')
+    grouped = defaultdict(list)
+    for filepath, fm, content in portfolio_files:
+        title = fm.get('title', os.path.basename(filepath))
 
-                        if any('portfolio' in t.lower() for t in tags) and status == 'completed':
-                            artifacts.append({
-                                'path': path,
-                                'frontmatter': frontmatter,
-                                'body': body,
-                                'tags': tags
-                            })
-                except Exception as e:
-                    print(f"Error parsing {path}: {e}")
-    return artifacts
+        # Try to infer category from tags or use 'Misc'
+        category = 'Misc'
+        tags = fm.get('tags', [])
+        if isinstance(tags, str):
+             tags = [tags]
+        if tags is None:
+             tags = []
 
-def build_portfolio():
-    artifacts = get_portfolio_artifacts()
-    grouped_artifacts = {}
+        if 'wgu-portfolio' in tags or 'learning' in tags or 'discovery' in tags:
+            category = 'Academic Competency'
+        elif 'git-stewardship' in tags or 'maintenance' in tags:
+            category = 'System Automation'
+        elif 'multi-agent' in tags or 'sync' in tags or 'handoff' in tags:
+            category = 'Multi-Agent Workflows'
+        elif 'precalc' in tags:
+            category = 'Academic Competency'
+        elif 'wgu' in [t.lower() for t in tags]:
+             category = 'Academic Competency'
 
-    for artifact in artifacts:
-        tags = artifact['tags']
-        group_name = "Uncategorized"
-        if tags:
-            # Group artifacts dynamically based on the first tag, replacing hyphens and title-casing
-            group_name = tags[0].replace('-', ' ').title()
+        content_no_fm = re.sub(r'^---\n.*?\n---', '', content, flags=re.DOTALL).strip()
+        grouped[category].append((title, filepath, content_no_fm))
 
-        if group_name not in grouped_artifacts:
-            grouped_artifacts[group_name] = []
+    with open(PORTFOLIO_FILE, 'r', encoding='utf-8') as f:
+        existing_portfolio = f.read()
 
-        grouped_artifacts[group_name].append(artifact)
+    if existing_portfolio.find(HEADER) != -1:
+        base_portfolio = existing_portfolio[:existing_portfolio.find(HEADER)]
+    else:
+        base_portfolio = existing_portfolio + '\n\n'
 
-    new_section = "\n## 📋 Automated Discovery & System Logs\n"
-    for group, items in grouped_artifacts.items():
-        new_section += f"\n### {group}\n"
-        for item in items:
-            title = item['frontmatter'].get('title', 'Untitled')
-            date = item['frontmatter'].get('date', '')
-            body_preview = sanitize_content(item['body'].strip()[:200] + "...")
-            new_section += f"- **{title}** ({date})\n  - {body_preview}\n"
+    new_section = HEADER + '\n\n'
+    for category, items in grouped.items():
+        new_section += f'### {category}\n\n'
+        for title, filepath, content in items:
+            new_section += f'#### [{title}]({filepath})\n'
+            preview = anonymize(content[:200]) + '...\n\n'
+            new_section += preview
 
-    try:
-        with open('PORTFOLIO.md', 'r', encoding='utf-8') as f:
-            portfolio_content = f.read()
-
-        if "## 📋 Automated Discovery & System Logs" in portfolio_content:
-            portfolio_content = portfolio_content.split("## 📋 Automated Discovery & System Logs")[0]
-
-        with open('PORTFOLIO.md', 'w', encoding='utf-8') as f:
-            f.write(portfolio_content.strip() + "\n" + new_section)
-    except Exception as e:
-        print(f"Error updating PORTFOLIO.md: {e}")
+    with open(PORTFOLIO_FILE, 'w', encoding='utf-8') as f:
+        f.write(base_portfolio + new_section)
+    print(f"Portfolio built successfully. Found {len(portfolio_files)} artifacts.")
 
 if __name__ == '__main__':
     build_portfolio()
