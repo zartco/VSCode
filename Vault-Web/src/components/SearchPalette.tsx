@@ -6,10 +6,11 @@ import { Search, File as FileIcon } from "lucide-react";
 interface SearchPaletteProps {
   files: VaultFile[];
   onSelect: (file: VaultFile) => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function SearchPalette({ files, onSelect, isOpen, onClose }: SearchPaletteProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<VaultFile[]>([]);
   const fuse = useRef(createSearchIndex(files));
@@ -21,18 +22,14 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "k") {
-        e.preventDefault();
-        setIsOpen(true);
-      }
       if (e.key === "Escape") {
-        setIsOpen(false);
+        onClose();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [onClose]);
 
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
@@ -65,14 +62,14 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
 
   const handleSelect = (file: VaultFile) => {
     onSelect(file);
-    setIsOpen(false);
+    onClose();
   };
 
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/50 backdrop-blur-sm">
-      <div className="fixed inset-0" onClick={() => setIsOpen(false)} />
+      <div className="fixed inset-0" onClick={onClose} />
       <div className="w-full max-w-2xl bg-[#1e1e1e] border border-[#333] rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[60vh] relative z-10">
         <div className="flex items-center px-4 border-b border-[#333]">
           <Search className="w-5 h-5 text-gray-400 mr-2" />
