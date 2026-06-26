@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
@@ -9,6 +9,9 @@ interface MarkdownReaderProps {
   file: VaultFile;
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
+
+const remarkPlugins = [remarkGfm, remarkMath];
+const rehypePlugins = [rehypeKatex];
 
 export default function MarkdownReader({
   file,
@@ -129,11 +132,14 @@ export default function MarkdownReader({
           style={{ color: "inherit" }}
         >
           <ReactMarkdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-            components={{
-              blockquote: renderBlockquote || defaultRenderBlockquote,
-            }}
+            remarkPlugins={remarkPlugins}
+            rehypePlugins={rehypePlugins}
+            components={useMemo(
+              () => ({
+                blockquote: renderBlockquote || defaultRenderBlockquote,
+              }),
+              [renderBlockquote] // defaultRenderBlockquote is recreated on every render, but it doesn't have internal state, we can omit it from deps or move it outside if we want, but using renderBlockquote as dep is fine
+            )}
           >
             {file.content}
           </ReactMarkdown>
