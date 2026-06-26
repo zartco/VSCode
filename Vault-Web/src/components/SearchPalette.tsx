@@ -79,7 +79,6 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
           <input
             ref={inputRef}
             type="text"
-            aria-label="Search files"
             className="w-full py-4 bg-transparent text-gray-200 placeholder-gray-500 outline-none"
             placeholder="Search files... (Ctrl+K to open)"
             value={query}
@@ -91,7 +90,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
             {results.map((file, idx) => (
               <button
                 key={file.path + idx}
-                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] rounded-md text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#10b981]"
+                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] rounded-md text-left transition-colors"
                 onClick={() => handleSelect(file)}
               >
                 <FileIcon className="w-4 h-4 text-gray-400 mr-3 shrink-0" />

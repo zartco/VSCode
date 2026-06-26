@@ -1,101 +1,129 @@
 import os
-import yaml
 import re
-from collections import defaultdict
+import yaml
 
-PORTFOLIO_FILE = 'PORTFOLIO.md'
-HEADER = '## 📋 Automated Discovery & System Logs'
+VAULT_DIRS = ['.']
 
-def anonymize(text):
-    text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[REDACTED_EMAIL]', text)
+def redact_content(content):
+    # Scrub local paths
+    content = re.sub(r'[a-zA-Z]:\\[^\s]+', '[REDACTED_PATH]', content)
+    # Scrub emails
+    content = re.sub(r'[\w\.-]+@[\w\.-]+\.\w+', '[REDACTED_EMAIL]', content)
+    return content
 
-    urls = re.findall(r'https?://[^\s]+', text)
-    for i, url in enumerate(urls):
-        text = text.replace(url, f"__URL_PLACEHOLDER_{i}__")
+def get_portfolio_files():
+    files_to_process = []
+    for dir_path in VAULT_DIRS:
+        if not os.path.exists(dir_path):
+            continue
+        for root, _, files in os.walk(dir_path):
+            if 'node_modules' in root or '.git' in root or '.jules' in root:
+                continue
+            for file in files:
+                if file.endswith('.md'):
+                    files_to_process.append(os.path.join(root, file))
 
-    text = re.sub(r'([A-Za-z]:\\[\w\\\-.]+)|(/[\w/\-.]+)', '[REDACTED_PATH]', text)
+    portfolio_artifacts = []
 
-    for i, url in enumerate(urls):
-        text = text.replace(f"__URL_PLACEHOLDER_{i}__", url)
-
-    return text
-
-def parse_frontmatter(content):
-    match = re.match(r'^---\n(.*?)\n---', content, re.DOTALL)
-    if match:
+    for filepath in files_to_process:
         try:
-            return yaml.safe_load(match.group(1))
-        except yaml.YAMLError:
-            pass
-    return None
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+
+            # Simple frontmatter parsing
+            if not content.startswith('---'):
+                continue
+
+            parts = content.split('---', 2)
+            if len(parts) < 3:
+                continue
+
+            frontmatter_str = parts[1]
+            body = parts[2].strip()
+
+            try:
+                metadata = yaml.safe_load(frontmatter_str)
+            except yaml.YAMLError:
+                continue
+
+            if not isinstance(metadata, dict):
+                continue
+
+            if metadata.get('status') != 'completed':
+                continue
+
+            tags = metadata.get('tags', [])
+            if isinstance(tags, str):
+                tags = [t.strip() for t in tags.split(',')]
+            elif not isinstance(tags, list):
+                tags = []
+
+            is_portfolio = any('portfolio' in str(t).lower() for t in tags)
+            if not is_portfolio:
+                continue
+
+            portfolio_artifacts.append({
+                'title': metadata.get('title', os.path.basename(filepath)),
+                'date': metadata.get('date', ''),
+                'tags': tags,
+                'body': redact_content(body),
+                'path': filepath
+            })
+
+        except Exception as e:
+            print(f"Error processing {filepath}: {e}")
+
+    return portfolio_artifacts
 
 def build_portfolio():
-    portfolio_files = []
-    for root, dirs, files in os.walk('.'):
-        if 'node_modules' in root or '.git' in root:
+    artifacts = get_portfolio_files()
+
+    groups = {
+        'Academic Competency': [],
+        'System Automation': [],
+        'Multi-Agent Workflows': [],
+        'Other Discovery': []
+    }
+
+    for item in artifacts:
+        tags = [str(t).lower() for t in item['tags']]
+        if 'academic' in tags or 'wgu-portfolio' in tags or 'learning' in tags:
+            groups['Academic Competency'].append(item)
+        elif 'system' in tags or 'automation' in tags:
+            groups['System Automation'].append(item)
+        elif 'agent' in tags or 'multi-agent' in tags or 'federation' in tags:
+            groups['Multi-Agent Workflows'].append(item)
+        else:
+            groups['Other Discovery'].append(item)
+
+    dynamic_section = "## 📋 Automated Discovery & System Logs\n\n"
+
+    for group_name, items in groups.items():
+        if not items:
             continue
-        for file in files:
-            if file.endswith('.md'):
-                filepath = os.path.join(root, file)
-                with open(filepath, 'r', encoding='utf-8') as f:
-                    content = f.read()
-                    fm = parse_frontmatter(content)
-                    if fm and isinstance(fm, dict):
-                        status = fm.get('status')
-                        tags = fm.get('tags', [])
-                        if isinstance(tags, str):
-                            tags = [tags]
-                        if not tags:
-                            tags = []
-                        is_portfolio = any('portfolio' in t.lower() for t in tags)
-                        if status == 'completed' and is_portfolio:
-                            portfolio_files.append((filepath, fm, content))
+        dynamic_section += f"### {group_name}\n\n"
+        for item in items:
+            dynamic_section += f"#### {item['title']} ({item['date']})\n"
+            dynamic_section += f"{item['body']}\n\n"
 
-    grouped = defaultdict(list)
-    for filepath, fm, content in portfolio_files:
-        title = fm.get('title', os.path.basename(filepath))
-
-        # Try to infer category from tags or use 'Misc'
-        category = 'Misc'
-        tags = fm.get('tags', [])
-        if isinstance(tags, str):
-             tags = [tags]
-        if tags is None:
-             tags = []
-
-        if 'wgu-portfolio' in tags or 'learning' in tags or 'discovery' in tags:
-            category = 'Academic Competency'
-        elif 'git-stewardship' in tags or 'maintenance' in tags:
-            category = 'System Automation'
-        elif 'multi-agent' in tags or 'sync' in tags or 'handoff' in tags:
-            category = 'Multi-Agent Workflows'
-        elif 'precalc' in tags:
-            category = 'Academic Competency'
-        elif 'wgu' in [t.lower() for t in tags]:
-             category = 'Academic Competency'
-
-        content_no_fm = re.sub(r'^---\n.*?\n---', '', content, flags=re.DOTALL).strip()
-        grouped[category].append((title, filepath, content_no_fm))
-
-    with open(PORTFOLIO_FILE, 'r', encoding='utf-8') as f:
-        existing_portfolio = f.read()
-
-    if existing_portfolio.find(HEADER) != -1:
-        base_portfolio = existing_portfolio[:existing_portfolio.find(HEADER)]
+    if os.path.exists('PORTFOLIO.md'):
+        with open('PORTFOLIO.md', 'r', encoding='utf-8') as f:
+            portfolio_content = f.read()
     else:
-        base_portfolio = existing_portfolio + '\n\n'
+        portfolio_content = "# Zartco's Academic & Engineering Showcase\n\nThis portfolio documents a four-year computer science progression, dynamically aggregated from active workspace artifacts.\n"
 
-    new_section = HEADER + '\n\n'
-    for category, items in grouped.items():
-        new_section += f'### {category}\n\n'
-        for title, filepath, content in items:
-            new_section += f'#### [{title}]({filepath})\n'
-            preview = anonymize(content[:200]) + '...\n\n'
-            new_section += preview
+    marker = "## 📋 Automated Discovery & System Logs"
 
-    with open(PORTFOLIO_FILE, 'w', encoding='utf-8') as f:
-        f.write(base_portfolio + new_section)
-    print(f"Portfolio built successfully. Found {len(portfolio_files)} artifacts.")
+    if marker in portfolio_content:
+        parts = portfolio_content.split(marker)
+        new_content = parts[0] + dynamic_section
+    else:
+        new_content = portfolio_content + "\n\n" + dynamic_section
 
-if __name__ == '__main__':
+    with open('PORTFOLIO.md', 'w', encoding='utf-8') as f:
+        f.write(new_content)
+
+    print("Portfolio built successfully.")
+
+if __name__ == "__main__":
     build_portfolio()

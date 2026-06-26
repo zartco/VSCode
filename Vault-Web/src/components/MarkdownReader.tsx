@@ -10,10 +10,6 @@ interface MarkdownReaderProps {
   renderBlockquote?: (props: { children?: React.ReactNode }) => React.ReactNode;
 }
 
-// ⚡ Bolt: Define static plugin arrays outside component to prevent recreating AST on every render
-const remarkPlugins = [remarkGfm, remarkMath];
-const rehypePlugins = [rehypeKatex];
-
 export default function MarkdownReader({
   file,
   renderBlockquote,
@@ -133,14 +129,11 @@ export default function MarkdownReader({
           style={{ color: "inherit" }}
         >
           <ReactMarkdown
-            remarkPlugins={remarkPlugins as any}
-            rehypePlugins={rehypePlugins as any}
-            components={React.useMemo(
-              () => ({
-                blockquote: renderBlockquote || defaultRenderBlockquote,
-              }),
-              [renderBlockquote] // Only recreate if renderBlockquote changes
-            )}
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              blockquote: renderBlockquote || defaultRenderBlockquote,
+            }}
           >
             {file.content}
           </ReactMarkdown>
