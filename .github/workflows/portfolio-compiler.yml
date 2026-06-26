@@ -2,28 +2,34 @@ name: Portfolio Compiler
 
 on:
   schedule:
-    - cron: '0 10 * * *' # 05:00 AM CDT
-
-permissions:
-  contents: write
+    - cron: '0 10 * * *' # 5:00 AM CDT is 10:00 AM UTC during daylight saving
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
+
       - name: Install dependencies
-        run: python -m pip install pyyaml
-      - name: Run portfolio builder
-        run: python scripts/build_portfolio.py
-      - name: Commit changes
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add PORTFOLIO.md
-          git commit -m "docs(portfolio): dynamic update to academic showcase" || echo "No changes to commit"
-          git push
+          pip install pyyaml
+
+      - name: Run portfolio compiler
+        run: |
+          # Set git config so commit works
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          python3 build_portfolio.py
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}

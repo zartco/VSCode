@@ -30,15 +30,8 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
       }
     };
 
-    const handleOpenSearch = () => setIsOpen(true);
-
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("open-search-palette", handleOpenSearch);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("open-search-palette", handleOpenSearch);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
@@ -82,13 +75,12 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
       <div className="fixed inset-0" onClick={() => setIsOpen(false)} />
       <div className="w-full max-w-2xl bg-[#1e1e1e] border border-[#333] rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[60vh] relative z-10">
         <div className="flex items-center px-4 border-b border-[#333]">
-          <Search className="w-5 h-5 text-gray-400 mr-2" aria-hidden="true" />
+          <Search className="w-5 h-5 text-gray-400 mr-2" />
           <input
             ref={inputRef}
             type="text"
-            aria-label="Search files"
             className="w-full py-4 bg-transparent text-gray-200 placeholder-gray-500 outline-none"
-            placeholder="Search files..."
+            placeholder="Search files... (Ctrl+K to open)"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -98,7 +90,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
             {results.map((file, idx) => (
               <button
                 key={file.path + idx}
-                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] focus:outline-none rounded-md text-left transition-colors"
+                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] rounded-md text-left transition-colors"
                 onClick={() => handleSelect(file)}
               >
                 <FileIcon className="w-4 h-4 text-gray-400 mr-3 shrink-0" />
