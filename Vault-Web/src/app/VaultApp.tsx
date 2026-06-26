@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Folder, Terminal, Network, BarChart, History, Box, Search } from "lucide-react";
+import React, { useState } from "react";
+import { Folder, Terminal, Network, BarChart, History, Box } from "lucide-react";
 import { VaultFile, VaultFolder } from "@/lib/vault";
 import FederationStatus from "@/components/FederationStatus";
 import { SearchPalette } from "@/components/SearchPalette";
@@ -24,19 +24,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
   const [activeView, setActiveView] = useState<
     "federation" | "folder" | "file" | "analytics" | "timelapse" | "3dnexus"
   >("3dnexus");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "k") {
-        e.preventDefault();
-        setIsSearchOpen(true);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   return (
     <div
@@ -52,8 +39,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
     >
       <SearchPalette
         files={files}
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
         onSelect={(file) => {
           setActiveFolder(file.folder);
           setActiveFile(file);
@@ -156,35 +141,6 @@ export default function VaultApp({ files, folders }: VaultAppProps) {
                 <Box size={18} />
                 <span>3D Nexus</span>
               </div>
-
-              <button
-                className="folder-item"
-                onClick={() => setIsSearchOpen(true)}
-                aria-label="Search Vault"
-                style={{
-                  width: "100%",
-                  marginBottom: "8px",
-                  color: "var(--text-primary)",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "8px 12px",
-                  background: "transparent",
-                  border: "none",
-                  textAlign: "left",
-                  fontFamily: "inherit",
-                  fontSize: "inherit"
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                  <Search size={18} />
-                  <span>Search</span>
-                </div>
-                <kbd className="bg-[#222] px-1.5 py-0.5 rounded text-[0.7rem] text-[#888] border border-[#444] font-mono">
-                  Ctrl+K
-                </kbd>
-              </button>
 
               <div
                 className={`folder-item ${activeView === "federation" ? "active" : ""}`}
