@@ -1,0 +1,27 @@
+
+> vault-web@0.1.0 dev /app/Vault-Web
+> next dev
+
+▲ Next.js 16.2.9 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+✓ Ready in 568ms
+
+○ Compiling / ...
+Error reading vault directory C:\Users\Zartc\Vault: Error: ENOENT: no such file or directory, scandir 'C:\Users\Zartc\Vault'
+    at getVaultFiles (src/lib/vault.ts:27:22)
+    at Home (src/app/page.tsx:7:30)
+  25 |
+  26 |   try {
+> 27 |     const items = fs.readdirSync(dirPath);
+     |                      ^
+  28 |
+  29 |     for (const item of items) {
+  30 |       const fullPath = path.join(dirPath, item); {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'scandir',
+  path: 'C:\\Users\\Zartc\\Vault'
+}
+ GET / 200 in 12.1s (next.js: 10.2s, application-code: 1870ms)
+[browser] THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.
