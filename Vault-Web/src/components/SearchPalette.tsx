@@ -71,7 +71,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/50 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/50 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Search files">
       <div className="fixed inset-0" onClick={() => setIsOpen(false)} />
       <div className="w-full max-w-2xl bg-[#1e1e1e] border border-[#333] rounded-lg shadow-2xl overflow-hidden flex flex-col max-h-[60vh] relative z-10">
         <div className="flex items-center px-4 border-b border-[#333]">
@@ -79,6 +79,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
           <input
             ref={inputRef}
             type="text"
+            aria-label="Search query"
             className="w-full py-4 bg-transparent text-gray-200 placeholder-gray-500 outline-none"
             placeholder="Search files... (Ctrl+K to open)"
             value={query}
@@ -90,7 +91,7 @@ export function SearchPalette({ files, onSelect }: SearchPaletteProps) {
             {results.map((file, idx) => (
               <button
                 key={file.path + idx}
-                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] rounded-md text-left transition-colors"
+                className="w-full flex items-center px-4 py-3 hover:bg-[#2a2a2a] focus:bg-[#2a2a2a] focus:outline-none focus:ring-2 focus:ring-[#3b82f6] rounded-md text-left transition-colors"
                 onClick={() => handleSelect(file)}
               >
                 <FileIcon className="w-4 h-4 text-gray-400 mr-3 shrink-0" />
