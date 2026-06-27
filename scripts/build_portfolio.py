@@ -12,7 +12,8 @@ def redact_content(text):
     text = re.sub(r'https?://[^\s<>"]+|www\.[^\s<>"]+', replace_url, text)
 
     # Redact local paths
-    text = re.sub(r'(?:[a-zA-Z]:\\|/)[^\s<>"]+', '[REDACTED_PATH]', text)
+    text = re.sub(r'\b[a-zA-Z]:\\[^\s<>"]+', '[REDACTED_PATH]', text)
+    text = re.sub(r'(?<!\.)/(?:home|Users|usr|opt|var|etc|bin|sbin|tmp)[^\s<>"]*', '[REDACTED_PATH]', text)
 
     # Redact emails
     text = re.sub(r'[\w\.-]+@[\w\.-]+\.\w+', '[REDACTED_EMAIL]', text)
@@ -45,7 +46,7 @@ def collect_artifacts():
         for file in files:
             if file.endswith('.md'):
                 file_path = os.path.join(root, file)
-                frontmatter, _ = parse_frontmatter(file_path)
+                frontmatter, content = parse_frontmatter(file_path)
 
                 if frontmatter and isinstance(frontmatter, dict):
                     status = str(frontmatter.get('status', '')).lower()
@@ -68,17 +69,20 @@ def collect_artifacts():
                         artifacts[competency].append({
                             'title': title,
                             'path': file_path,
-                            'frontmatter': frontmatter
+                            'frontmatter': frontmatter,
+                            'content': content.strip() if content else ""
                         })
     return artifacts
 
 def generate_portfolio_markdown(artifacts):
     md = "## 📋 Automated Discovery & System Logs\n\n"
     for competency, items in artifacts.items():
-        md += f"### {competency}\n"
+        md += f"### {competency}\n\n"
         for item in items:
-            md += f"- **{item['title']}** (Source: `[REDACTED_PATH]`)\n"
-    return redact_content(md)
+            md += f"#### {item['title']}\n\n"
+            if item['content']:
+                md += f"{item['content']}\n\n"
+    return redact_content(md.strip())
 
 def update_portfolio():
     artifacts = collect_artifacts()
