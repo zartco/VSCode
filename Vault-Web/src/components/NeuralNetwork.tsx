@@ -54,10 +54,21 @@ export default function NeuralNetwork({ files }: NeuralNetworkProps) {
 
   const connections = useMemo(() => {
     const lines: THREE.Vector3[][] = [];
+
+    // ⚡ Bolt: Pre-group nodes by layerIndex to avoid O(n²) filtering inside the loop
+    const nodesByLayer: Record<number, typeof nodes> = {};
+    nodes.forEach(node => {
+      if (!nodesByLayer[node.layerIndex]) {
+        nodesByLayer[node.layerIndex] = [];
+      }
+      nodesByLayer[node.layerIndex].push(node);
+    });
+
     nodes.forEach((node) => {
       // Connect to the next layer sequentially to keep the flowing look
       if (node.layerIndex < layers.length - 1) {
-        const nextLayerNodes = nodes.filter(n => n.layerIndex === node.layerIndex + 1);
+        // Look up next layer nodes in O(1) instead of O(N) filtering
+        const nextLayerNodes = nodesByLayer[node.layerIndex + 1] || [];
         
         // Find nodes with shared tags
         let connected = false;
