@@ -1,0 +1,8 @@
+{
+  "baseFontSize": 16,
+  "enabledCssSnippets": [
+    "wgu-theme"
+  ],
+  "accentColor": "#002aa8",
+  "showRibbon": true
+}

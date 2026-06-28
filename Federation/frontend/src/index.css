@@ -6,20 +6,20 @@
 
 :root {
   --bg-0: #000000;
-  --bg-1: #030303;
-  --bg-2: #0a0a0a;
-  --bg-3: #111111;
+  --bg-1: #050505;
+  --bg-2: #0f0f0f;
+  --bg-3: #1a1a1a;
   --border: #003300;
-  --text-primary: #00ff00;
-  --text-secondary: #00cc00;
+  --text-primary: #e6e6e6;
+  --text-secondary: #00ffff;
   --text-muted: #008800;
-  --accent-orange: #f59e0b;
-  --accent-blue: #2a8bd6;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
-  --accent-yellow: #facc15;
-  --accent-purple: #a78bfa;
-  --accent-pink: #f472b6;
+  --accent-orange: #ff9d00;
+  --accent-blue: #00aaff;
+  --accent-green: #00ff00;
+  --accent-red: #ff3366;
+  --accent-yellow: #ffff00;
+  --accent-purple: #bb00ff;
+  --accent-pink: #ff00ff;
   --accent-matrix: #00ff00;
   
   --font-mono: 'Geist Mono', Consolas, 'Courier New', monospace;

@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Chrome Matrix Theme",
+  "version": "1.0",
+  "description": "Matrix styling with shadow DOM piercing and strict image exclusions.",
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://localhost/*", "*://127.0.0.1/*"],
+      "css": ["content.css"],
+      "js": ["pierce-shadow.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ]
+}

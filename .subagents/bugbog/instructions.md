@@ -1,0 +1,1 @@
+Look for bugs, generate a detailed report and leave it at C:/VSCode

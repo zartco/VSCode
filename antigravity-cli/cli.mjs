@@ -10,7 +10,7 @@
  */
 
 import { createInterface } from 'readline';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -37,6 +37,8 @@ const C = {
   red:      '\x1b[38;2;255;60;60m',
   cyan:     '\x1b[38;2;0;255;180m',
   white:    '\x1b[38;2;200;255;200m',
+  magenta:  '\x1b[38;2;255;0;255m',
+  blue:     '\x1b[38;2;100;150;255m',
 };
 
 const AGENTAPI = 'C:\\Users\\Zartc\\.gemini\\antigravity-ide\\bin\\agentapi.bat';
@@ -212,12 +214,12 @@ function displayUserMessage(text) {
   console.log();
   const header = ` USER `;
   const borderRight = '═'.repeat(Math.max(0, innerWidth - header.length - 2));
-  console.log(`  ${C.cyan}╔═${header}${borderRight}╗${C.reset}`);
+  console.log(`  ${C.magenta}╔═${header}${borderRight}╗${C.reset}`);
   for (const l of wrapped) {
     const pad = Math.max(0, maxBubble - l.length);
-    console.log(`  ${C.cyan}║${C.reset}  ${C.white}${l}${' '.repeat(pad)}  ${C.cyan}║${C.reset}`);
+    console.log(`  ${C.magenta}║${C.reset}  ${C.white}${l}${' '.repeat(pad)}  ${C.magenta}║${C.reset}`);
   }
-  console.log(`  ${C.cyan}╚${'═'.repeat(innerWidth)}╝${C.reset}`);
+  console.log(`  ${C.magenta}╚${'═'.repeat(innerWidth)}╝${C.reset}`);
 }
 
 function displayAgentMessage(text) {
@@ -229,19 +231,19 @@ function displayAgentMessage(text) {
   console.log();
   const header = ` ANTIGRAVITY `;
   const borderRight = '═'.repeat(Math.max(0, innerWidth - header.length - 2));
-  console.log(`  ${C.green}╔═${header}${borderRight}╗${C.reset}`);
+  console.log(`  ${C.cyan}╔═${header}${borderRight}╗${C.reset}`);
   for (const l of wrapped) {
     const pad = Math.max(0, maxBubble - l.length);
-    console.log(`  ${C.green}║${C.reset}  ${C.green}${C.bold}${l}${' '.repeat(pad)}${C.reset}  ${C.green}║${C.reset}`);
+    console.log(`  ${C.cyan}║${C.reset}  ${C.cyan}${C.bold}${l}${' '.repeat(pad)}${C.reset}  ${C.cyan}║${C.reset}`);
   }
-  console.log(`  ${C.green}╚${'═'.repeat(innerWidth)}╝${C.reset}`);
+  console.log(`  ${C.cyan}╚${'═'.repeat(innerWidth)}╝${C.reset}`);
 }
 
 // ═══════════════════════════════════════════════════════════════
 //  Outputs
 // ═══════════════════════════════════════════════════════════════
 function displaySystem(text) {
-  console.log(`  ${C.dimGreen}${C.italic}⟫ ${text}${C.reset}`);
+  console.log(`  ${C.blue}${C.italic}⟫ ${text}${C.reset}`);
 }
 
 function displayError(text) {
@@ -440,6 +442,56 @@ function handleCommand(input) {
 
 
 // ═══════════════════════════════════════════════════════════════
+//  Sixel Logo Renderer
+//  Renders assets/logo.{png,jpg,webp,ppm} via chafa before the
+//  text banner.  Silently skips if chafa is not installed or no
+//  logo file is found — the ASCII banner always renders either way.
+// ═══════════════════════════════════════════════════════════════
+function renderSixelLogo() {
+  // Locate the first supported image format in assets/
+  const assetDir = path.join(__dirname, 'assets');
+  const candidates = ['logo.png', 'logo.jpg', 'logo.webp', 'logo.ppm', 'logo.bmp'];
+  let logoPath = null;
+  for (const name of candidates) {
+    const candidate = path.join(assetDir, name);
+    if (fs.existsSync(candidate)) { logoPath = candidate; break; }
+  }
+  if (!logoPath) return;
+
+  // Verify chafa is on PATH without throwing
+  const check = spawnSync('chafa', ['--version'], { encoding: 'utf8' });
+  if (check.error || check.status !== 0) return;
+
+  // 50% of terminal width → at 120 cols that's 60 cols × 10px = 600px,
+  // which matches the source exactly (no upscaling = no blocky pixels).
+  const termCols = cols();
+  const logoW    = Math.min(Math.max(20, Math.floor(termCols * 0.5)), 80);
+
+  // spawnSync with encoding:'buffer' captures raw bytes — important because
+  // Sixel data is a binary escape sequence stream, not plain UTF-8 text.
+  const result = spawnSync('chafa', [
+    '--format',      'sixel',
+    '--color-space', 'din99d',
+    '--size',        `${logoW}x12`,
+    logoPath,
+    // Note: no --center=on here.  chafa detects terminal width via a pty
+    // query that spawnSync can't answer, so the centering is wrong.
+    // We do it ourselves below with CHA (Cursor Horizontal Absolute).
+  ], { encoding: 'buffer' });
+
+  if (result.status === 0 && result.stdout.length > 0) {
+    // CHA = ESC [ n G  — moves cursor to column n (1-indexed).
+    // Sixel renders from wherever the cursor is when ESC P fires, and each
+    // internal newline ('-') wraps back to that same column — so getting
+    // the cursor right once is enough to center the entire image.
+    const leftPad = Math.max(0, Math.floor((termCols - logoW) / 2));
+    process.stdout.write(`\x1b[${leftPad + 1}G`);
+    process.stdout.write(result.stdout);
+    process.stdout.write('\n');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  Main Loop & Background Polling
 // ═══════════════════════════════════════════════════════════════
 let rl;
@@ -512,6 +564,7 @@ async function pollTranscript() {
 
 async function main() {
   clear();
+  renderSixelLogo();
   drawBanner();
 
   console.log();
@@ -526,7 +579,7 @@ async function main() {
   rl = createInterface({
     input: process.stdin,
     output: process.stdout,
-    prompt: `${C.cyan}AGY${C.dimGreen} ⟫ ${C.reset}`,
+    prompt: `${C.magenta}AGY${C.blue} ⟫ ${C.reset}`,
   });
 
   // Start the background poller

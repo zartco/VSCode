@@ -18,11 +18,11 @@ Start-Process wt -ArgumentList $wtArgString
 Write-Host "Starting Google Chrome on Monitor 1..."
 Start-Process chrome -ArgumentList "--app=http://localhost:5173", "--window-position=0,0", "--start-fullscreen"
 
-# Launch Antigravity IDE for Antigravity CLI
-$cliDir = "C:\VSCode\antigravity-cli"
+# Launch Antigravity IDE to C:\VSCode
+$targetDir = "C:\VSCode"
 $ideExe = "C:\Users\Zartc\AppData\Local\Programs\Antigravity IDE\Antigravity IDE.exe"
 
-Write-Host "Starting Antigravity IDE for CLI..."
-Start-Process $ideExe -ArgumentList "`"$cliDir`""
+Write-Host "Starting Antigravity IDE..."
+Start-Process $ideExe -ArgumentList "`"$targetDir`""
 
 Write-Host "All services launched."

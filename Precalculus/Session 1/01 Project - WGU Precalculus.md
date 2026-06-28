@@ -40,7 +40,7 @@ Assessment: 14 quizzes, 1 midterm, 1 final, 3 competency units.
 
 **Key paths:**
 - Connected working folder: `C:\VSCode\Precalculus`
-- Vault: `C:\Users\Zartc\Vault`
+- Vault: `C:\VSCode\Vault`
 - HTML notebook: `...\WGU_Precalculus_Notebook.html`
 - OpenStax PDFs: vault `Textbooks\` (also in the working-folder root)
 - Syllabus `Precalculus_syllabus_v3.pdf`; completion guide `Precalculus_guide_v2.pdf`

@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "Matrix UI Browser Theme",
+  "version": "1.0",
+  "description": "A pure cosmetic browser theme to complement the Matrix web extension. Styles the tabs, toolbar, and new tab page.",
+  "theme": {
+    "colors": {
+      "frame": [0, 0, 0],
+      "frame_inactive": [15, 15, 15],
+      "toolbar": [0, 0, 0],
+      "ntp_text": [0, 255, 65],
+      "ntp_link": [0, 143, 17],
+      "ntp_background": [0, 0, 0],
+      "button_background": [0, 0, 0],
+      "toolbar_button_icon": [0, 255, 65],
+      "toolbar_text": [0, 255, 65],
+      "omnibox_text": [0, 255, 65],
+      "omnibox_background": [20, 20, 20],
+      "tab_text": [0, 255, 65],
+      "tab_background_text": [0, 143, 17]
+    }
+  }
+}

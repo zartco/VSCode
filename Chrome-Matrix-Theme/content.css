@@ -1,0 +1,113 @@
+/* Core Matrix Aesthetic */
+:root {
+  --matrix-bg: #000000;
+  --matrix-fg: #00ff41;
+  --matrix-border: #008f11;
+}
+
+/* Base Terminal Background */
+html, body {
+  background-color: #000000 !important;
+  background-image: none !important;
+}
+
+/* Force Text and Borders to Matrix Green (God-Tier Specificity) */
+*:not(img):not(video):not(canvas):not(svg):not(picture):not(#__matrix1):not(#__matrix2):not(#__matrix3),
+[id]:not(img):not(video):not(canvas):not(svg):not(picture):not(#__matrix1):not(#__matrix2):not(#__matrix3) {
+  color: #00ff41 !important;
+  border-color: #008f11 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Force Monospace Font, except on icon classes and math elements */
+*:not(img):not(video):not(canvas):not(svg):not(picture):not(.google-symbols):not(.material-symbols-outlined):not(.material-symbols-rounded):not(.material-symbols-sharp):not(.material-icons):not(mat-icon):not([class*="icon" i]):not([class*="math" i]):not([class*="mjx" i]):not([class*="katex" i]):not([class*="tex" i]):not(math) {
+  font-family: 'Courier New', Courier, monospace !important;
+}
+
+/* 
+  Rule 1: Set background COLOR to BLACK for EVERYTHING.
+  Using chained :not(#id) to artificially inflate specificity to god-tier (3,0,0) 
+  so it absolutely crushes any !important classes Google News is using.
+*/
+*:not(html):not(body):not(img):not(video):not(canvas):not(svg):not(picture):not(#__matrix1):not(#__matrix2):not(#__matrix3),
+[id]:not(html):not(body):not(img):not(video):not(canvas):not(svg):not(picture):not(#__matrix1):not(#__matrix2):not(#__matrix3) {
+  background-color: #000000 !important;
+  box-shadow: none !important; 
+}
+
+/* 
+  Rule 2: Strip background IMAGE (gradients) from EVERYTHING.
+  We exclude elements that have an inline 'url(' style to preserve article thumbnails, 
+  but this will successfully annihilate any linear-gradients (like white weather widgets).
+*/
+*:not(img):not(video):not(canvas):not(svg):not(picture):not([style*="url("]):not(#__matrix1):not(#__matrix2):not(#__matrix3) {
+  background-image: none !important;
+}
+
+/* Just in case the weather widget is an SVG with a solid white background rect */
+svg rect[fill="#ffffff"], svg rect[fill="#fff"], svg rect[fill="white"] {
+  fill: transparent !important;
+}
+
+/* Use high specificity to restore solid black backgrounds to popups and form elements so they don't overlap text */
+html body input:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body textarea:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body select:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body button:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body dialog:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="menu"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="dialog"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="listbox"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="tooltip"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="button"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="tab"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body cr-realbox-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body .dropdown-wrapper:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.sbsb_a:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.sbdd_b:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.gstl_50:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.ytd-searchbox-spt:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+tp-yt-iron-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+iron-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+[role="listbox"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+#suggestions:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+ytd-searchbox:not(#__matrix1):not(#__matrix2):not(#__matrix3) {
+  background-color: #000000 !important;
+  border: 1px solid #008f11 !important;
+}
+
+/* Ensure images render in a Matrix style: turns black pixels into crisp solid green, and white pixels to black */
+img, video, canvas, svg, picture, [style*="background-image"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  mix-blend-mode: normal !important;
+  filter: invert(1) brightness(0.6) sepia(1) hue-rotate(85deg) saturate(600%) brightness(1.2) !important;
+  background-color: transparent !important;
+}
+
+/* 
+  NEON SYNTAX HIGHLIGHTING 
+  (Uses :not(#__syntax) to achieve 1,0,0 specificity, beating the 0,0,5 wildcard)
+*/
+
+/* Headings -> Cyan */
+h1:not(#__syntax), h1 *:not(#__syntax),
+h2:not(#__syntax), h2 *:not(#__syntax),
+h3:not(#__syntax), h3 *:not(#__syntax),
+h4:not(#__syntax), h4 *:not(#__syntax),
+h5:not(#__syntax), h5 *:not(#__syntax),
+h6:not(#__syntax), h6 *:not(#__syntax) {
+  color: #00ffb4 !important;
+  border-color: #00ffb4 !important;
+}
+
+/* Bold/Emphasis -> Yellow */
+b:not(#__syntax), b *:not(#__syntax),
+strong:not(#__syntax), strong *:not(#__syntax),
+em:not(#__syntax), em *:not(#__syntax),
+i:not(#__syntax), i *:not(#__syntax),
+mark:not(#__syntax), mark *:not(#__syntax) {
+  color: #ffff00 !important;
+}

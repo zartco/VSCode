@@ -10,5 +10,12 @@
         "resume": "bash \"$AGENT_DIR/resume.sh\" ollama llama-standby"
       }
     }
+  ],
+  "agents": [
+    {
+      "name": "bugbog",
+      "vendor": "ollama",
+      "triggers": "Run once daily at 17:45"
+    }
   ]
 }

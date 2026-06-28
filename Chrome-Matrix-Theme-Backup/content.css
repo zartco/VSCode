@@ -1,0 +1,11 @@
+html, body, :root *:not(img, video, svg, canvas, #player *, #player-container *, .ytd-rich-item-renderer *, .ytd-guide-renderer *, .ytd-masthead *, #shorts-inner-container *, .ytd-grid-renderer *, .ytd-video-primary-info-renderer *, .ytd-watch-metadata *, .video-stream) {
+  color: #0f0 !important;
+  background-color: #000 !important;
+  border-color: #080 !important;
+}
+
+:root a, :root a * {
+  color: #39ff14 !important;
+  text-shadow: 0 0 5px #080 !important;
+  background-color: transparent !important;
+}

@@ -11,7 +11,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--accent-matrix);
+  color: var(--accent-blue);
   padding: 16px 16px 8px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -49,7 +49,7 @@
 }
 
 .agent-card--selected {
-  background: rgba(0,255,0, 0.1);
+  background: rgba(255,0,255, 0.1);
   border-color: var(--accent-matrix);
 }
 
@@ -132,15 +132,15 @@
 
 /* Orchestrator special styling */
 .agent-card--orchestrator {
-  border: 1.5px solid var(--accent-matrix) !important;
-  background: linear-gradient(135deg, rgba(0, 50, 0, 0.25) 0%, rgba(0, 0, 0, 0.95) 100%) !important;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.15);
+  border: 1.5px solid var(--accent-pink) !important;
+  background: linear-gradient(135deg, rgba(50, 0, 50, 0.25) 0%, rgba(0, 0, 0, 0.95) 100%) !important;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.15);
   position: relative;
   overflow: hidden;
 }
 
 .agent-card--orchestrator:hover {
-  box-shadow: 0 0 16px rgba(0, 255, 0, 0.35);
+  box-shadow: 0 0 16px rgba(255, 0, 255, 0.35);
   transform: translateX(6px);
 }
 

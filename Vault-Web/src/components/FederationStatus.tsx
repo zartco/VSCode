@@ -98,7 +98,7 @@ export default function FederationStatus() {
           }
         />
         <span
-          style={{ fontWeight: "bold", letterSpacing: "1px", color: "#ffffff" }}
+          style={{ fontWeight: "bold", letterSpacing: "1px", color: "#ff00ff" }}
         >
           FED_LINK
         </span>
@@ -113,7 +113,7 @@ export default function FederationStatus() {
           paddingLeft: "16px",
         }}
       >
-        <span style={{ color: "#555" }}>[STS]</span>
+        <span style={{ color: "#00ffff" }}>[STS]</span>
         <span
           style={{
             color:
@@ -139,10 +139,10 @@ export default function FederationStatus() {
           textOverflow: "ellipsis",
           borderLeft: "1px solid #333",
           paddingLeft: "16px",
-          color: "#00ff00",
+          color: "#00ffff",
         }}
       >
-        <span style={{ color: "#555", marginRight: "8px" }}>&gt;</span>
+        <span style={{ color: "#ff00ff", marginRight: "8px" }}>&gt;</span>
         {lastEvent}
       </div>
     </div>

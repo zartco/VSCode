@@ -1,0 +1,26 @@
+/* WGU Precalculus theme — contrast-aware (deep navy on light, bright blue on dark) */
+
+/* accent + link colors per theme */
+.theme-light { --interactive-accent: #0b1533; --link-color: #1f57b6; }
+.theme-dark  { --interactive-accent: #5e8fd6; --link-color: #84b0ee; }
+
+/* heading text color — reading view */
+.theme-light .markdown-rendered h1,
+.theme-light .markdown-rendered h2,
+.theme-light .markdown-rendered h3 { color: #13294b; }
+.theme-dark  .markdown-rendered h1,
+.theme-dark  .markdown-rendered h2,
+.theme-dark  .markdown-rendered h3 { color: #9cc2f5; }
+
+/* heading text color — editing / live preview */
+.theme-light .markdown-source-view.mod-cm6 .cm-header { color: #13294b; }
+.theme-dark  .markdown-source-view.mod-cm6 .cm-header { color: #9cc2f5; }
+
+/* heading accents (use the per-theme accent so they stay visible) */
+.markdown-rendered h1 { border-bottom: 2px solid var(--interactive-accent); padding-bottom: .2em; }
+.markdown-rendered h2 { border-left: 4px solid var(--interactive-accent); padding-left: .5em; }
+
+/* callout tints — bright enough for dark mode, fine on light */
+.callout[data-callout="goal"]     { --callout-color: 94,143,214; }
+.callout[data-callout="warning"]  { --callout-color: 216,151,60; }
+.callout[data-callout="question"] { --callout-color: 132,176,238; }

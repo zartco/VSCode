@@ -26,7 +26,7 @@
 .app-title {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent-matrix);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -132,7 +132,7 @@
 }
 
 .app-nav button.active {
-  color: var(--accent-matrix);
-  border-bottom: 2px solid var(--accent-matrix);
-  text-shadow: 0 0 10px rgba(0,255,0,0.4);
+  color: var(--accent-blue);
+  border-bottom: 2px solid var(--accent-blue);
+  text-shadow: 0 0 10px rgba(0,170,255,0.4);
 }

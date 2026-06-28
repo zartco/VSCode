@@ -10,7 +10,7 @@
 
 A unified, continuously evolving repository tracking a four-year computer science degree. Currently, it houses my CS50 coursework exercises, a fully featured YouTube downloader desktop application, and the early stages of a Federated Agent Control Plane for AI orchestration.
 
-> **Note:** The definitive, interactive documentation and agent handoff payloads are managed within a local **Obsidian Vault** (`C:\Users\Zartc\Vault`). This README provides a high-level overview for GitHub.
+> **Note:** The definitive, interactive documentation and agent handoff payloads are managed within a local **Obsidian Vault** (`C:\VSCode\Vault`). This README provides a high-level overview for GitHub.
 
 > **Showcase:** View the structured academic and engineering progression in the [Portfolio Showcase](PORTFOLIO.md).
 

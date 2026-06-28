@@ -1,0 +1,25 @@
+html body input:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body textarea:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body select:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body button:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body dialog:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="menu"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="dialog"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="listbox"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="tooltip"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="button"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body [role="tab"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body cr-realbox-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+html body .dropdown-wrapper:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.sbsb_a:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.sbdd_b:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.gstl_50:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+.ytd-searchbox-spt:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+tp-yt-iron-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+iron-dropdown:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+[role="listbox"]:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+#suggestions:not(#__matrix1):not(#__matrix2):not(#__matrix3),
+ytd-searchbox:not(#__matrix1):not(#__matrix2):not(#__matrix3) {
+  background-color: #000000 !important;
+  border: 1px solid #008f11 !important;
+}
