@@ -1,3 +1,13 @@
+# Agent Inbox
+
+## Daily Stewardship - 2026-07-10
+
+- Posted `Daily Digest - 2026-07-10` as issue #160; there were no commits in the last 24 hours.
+- Posted `Security Finding - 2026-07-10` as issue #161 for validated Federation-Center API exposure paths.
+- Updated automation vulnerability memory with the Federation-Center findings so future scans skip them.
+- GitHub accepted issue creation but rejected label updates with `Resource not accessible by integration`; #160 still needs `digest`, and #161 still needs `security`.
+- Re-entry: review Federation-Center as a standalone local API surface before regular dashboard use.
+
 # Daily Digest - Workspace Evolution (2026-06-13)
 
 ## CS Concepts Touched
